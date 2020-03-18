@@ -1,54 +1,42 @@
 /**
- * Distributed Guitar Amp Demo
+ * Recurse Roulette
  * ===
  */
 
-const express = require('express');
+const express = require("express");
 const app = express();
-const ExpressPeerServer = require('peer').ExpressPeerServer;
-
+const ExpressPeerServer = require("peer").ExpressPeerServer;
 const server = app.listen(9000);
 const options = {
-    debug: false
-}
+  debug: false
+};
 
-app.use('/', express.static('public'));
+const peerServer = ExpressPeerServer(server, options);
 
-app.use('/peer', ExpressPeerServer(server, options));
+const peers = new Set();
 
+app.use("/", express.static("public"));
+app.use("/peer", peerServer);
 
-server.on('stream', function(id) { 
-  console.log("stream");
-  // console.log(id);
+app.get("/api/peers", function(req, res) {  
+  console.log(peers);
+  return res.json(Array.from(peers));
 });
 
-server.on('call', function(id) { 
-  console.log("closed");
-  // console.log(id);
+// Client should send their own id to this endpoint
+// to be removed from the available peer list
+app.get("/api/peers/consume/:id", function(req, res) {  
+  const consumedPeer = req.params.id;
+  const result = peers.delete(consumedPeer);
+  return res.json({
+    success: result
+  });
 });
 
-server.on('connection', function(id) { 
-  console.log("connected");
-  // console.log(id);
+peerServer.on("connection", function(id) {
+  peers.add(id);
 });
 
-server.on('data', function(id) { 
-  console.log("data")
-  // console.log(id);
+peerServer.on("disconnect", function(id) {
+  peers.delete(id);  
 });
-
-server.on('disconnect', function(id) { 
-  console.log("Disconnected:");
-  // // console.log(id);
-});
-
-server.on('close', function(id) { 
-  console.log("Close");
-  // // console.log(id);
-});
-
-
-
-
-
-
