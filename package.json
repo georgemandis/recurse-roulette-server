@@ -1,0 +1,23 @@
+{
+  "name": "recurse-roulette-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georgemandis/recurse-roulette-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/georgemandis/recurse-roulette-server/issues"
+  },
+  "homepage": "https://github.com/georgemandis/recurse-roulette-server#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "peer": "^0.3.2"
+  }
+}
