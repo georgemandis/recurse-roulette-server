@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/georgemandis/recurse-roulette-server/issues"
   },
-  "homepage": "https://github.com/georgemandis/recurse-roulette-server#readme"
+  "homepage": "https://github.com/georgemandis/recurse-roulette-server#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "peer": "^0.3.2"
+  }
 }
