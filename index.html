@@ -5,100 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recurse Roulette</title>
     <script src="/js/peerjs.min.js"></script>
-    <style>
-      :root {
-        --bg-color: white;
-        --recurse-green: #3dc06c;
-        --main-txt-color: black;
-        --break-sm: 450px;
-        --break-md: 800px;
-        --break-lg: 1200px;
-      }
-
-      #me {
-        transform: scaleX(-1);
-      }
-
-      video {
-        border: 1px black solid;
-        width: 50%;
-        margin: 10px;
-        height: 300px;
-      }
-
-      .title {
-        display: inline;
-        color: var(--recurse-green);
-      }
-
-      img.title {
-        width: 50px;
-        height: 50px;
-      }
-
-      html {
-        height: 100vh;
-      }
-      body {
-        min-height: 100vh;
-        box-sizing: border-box;
-
-        margin: 0;
-        padding: 1em 0 0.5em 0;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .content .buttons {
-        margin-top: 1em;
-      }
-
-      .videos {
-        display: flex;
-        text-align: center;
-        flex-direction: row;
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style/main.css" />
   </head>
   <body>
-    <marquee scrollamount="4" direction="right">
-      <h1 class="title">Recurse Roulette</h1>
-      <img
-        class="title"
-        src="https://d29xw0ra2h4o4u.cloudfront.net/assets/logo_square-051508b5ecf8868635aea567bb86f423f4d1786776e5dfce4adf2bc7edf05804.png"
-    /></marquee>
+    <nav>
+      <a class="mx-3" href="/">
+        <img class="logo" src="media/logo.svg" />
+      </a>
+      <div class="nav-container">
+        <a
+          class="nav-link mx-3"
+          target="_blank"
+          href="https://github.com/georgemandis/recurse-roulette-server"
+          >Github</a
+        >
+      </div>
+    </nav>
 
-    <div class="content">
+    <div class="content vertical-center">
+      <h1 class="title mb-3">Recurse Roulette</h1>
+
       <!-- video streams -->
-      <div class="videos">
+      <div class="video-container">
         <!--Video stream for me-->
-        <video id="me" autoplay="autoplay" muted></video>
-
+        <video class="mb-3" id="me" autoplay="autoplay" muted></video>
         <!--Video stream for connect peer-->
-        <video id="you" autoplay="autoplay"></video>
+        <video class="mb-3" id="you" autoplay="autoplay"></video>
       </div>
 
       <!-- buttons -->
-      <div class="buttons">
+      <div class="button-container mb-3">
         <!--Join the queue-->
-        <button id="connect">Join</button>
+        <button class="button mx-3" id="connect">Join</button>
         <!--End the call-->
-        <button id="close">Hangup</button>
+        <button class="button" id="close">Hangup</button>
       </div>
+      <marquee class="mb-3">
+        Social Rules: 1. No well-actually’s 2. No feigning surprise 3. No
+        backseat driving 4. No subtle -isms
+      </marquee>
     </div>
-
-    <marquee>
-      Social Rules: 1. No well-actually’s 2. No feigning surprise 3. No backseat
-      driving 4. No subtle -isms GOT IT?????
-    </marquee>
 
     <script>
       const me = document.querySelector("#me");
@@ -175,7 +121,7 @@
           peerCall.on("close", handleClose);
         });
       }
-      
+
       async function handleStream(remoteStream) {
         you.srcObject = remoteStream;
         await fetch(`/api/peers/consume/${myPeerID}`);
