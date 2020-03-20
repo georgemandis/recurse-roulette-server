@@ -8,9 +8,6 @@ const app = express();
 const ExpressPeerServer = require("peer").ExpressPeerServer;
 const server = app.listen(process.env.PORT);
 const session = require("express-session");
-const options = {
-  debug: false
-};
 
 //oAuth stuff to authentication with Recurse Center log in
 const credentials = {
@@ -24,6 +21,11 @@ const credentials = {
 };
 
 const oauth2 = require("simple-oauth2").create(credentials);
+
+const options = {
+  debug: false,
+  path: '/'
+};
 
 const peerServer = ExpressPeerServer(server, options);
 const peers = new Set();
