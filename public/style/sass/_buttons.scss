@@ -1,0 +1,32 @@
+//source https://fdossena.com/?p=html5cool/buttons/i.frag
+
+.button {
+  display: inline-block;
+  border-radius: 2em;
+  padding: 0.5em 3em;
+  border: 0.16em solid $primary-color;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-weight: 400;
+  color: $secondary-color;
+  border-color: $primary-color;
+  background-color: $primary-color;
+  text-align: center;
+  transition: all 0.15s;
+  &:hover {
+    cursor: pointer;
+    font-weight: bold;
+    border-color: $primary-color;
+    background-color: $background-color;
+  }
+  &:focus {
+    border-color: $primary-color;
+    background-color: $primary-color;
+  }
+  &:active {
+    border-color: $primary-color;
+  }
+  @media screen and (max-width: $medium) {
+     display: block;
+  }
+}

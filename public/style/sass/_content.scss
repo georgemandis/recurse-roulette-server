@@ -1,0 +1,66 @@
+html {
+  font-size: 1.125em;
+  color: $text-color;
+}
+
+body {
+  font: 100% $font-stack;
+  background-color: $background-color;
+  min-height: 100vh;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+h1 {
+  text-align: center;
+}
+
+a {
+  color: $primary-color;
+}
+
+.title {
+  display: inline;
+  font-family: $headings-font;
+  color: $primary-color;
+}
+
+.content {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.video-container {
+  width: 100%;
+  @media screen and (min-width: $medium) {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
+}
+
+video {
+  border: 1px $secondary-color solid;
+  width: 50%;
+  margin: 0 10px;
+  height: 400px;
+  @media screen and (max-width: $medium) {
+    height: 200px;
+    width: 100%;
+    margin: 0;
+  }
+}
+
+#me {
+  transform: scaleX(-1);
+}

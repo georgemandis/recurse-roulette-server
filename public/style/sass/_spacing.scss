@@ -1,0 +1,26 @@
+.vertical-center {
+  margin: 0 auto;
+}
+
+//margin classes
+.mt-3 {
+  margin-top: 15px;
+}
+.mb-3 {
+  margin-bottom: 15px;
+}
+.my-3 {
+  @extend .mt-3, .mb-3;
+}
+.ml-3 {
+  margin-left: 15px;
+}
+.mr-3 {
+  margin-right: 15px;
+}
+.mx-3 {
+  @extend .ml-3, .mr-3;
+}
+.m-3 {
+  @extend .my-3, .mx-3;
+}
