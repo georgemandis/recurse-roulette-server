@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recurse Roulette</title>
+    <script src="/js/peerjs.min.js"></script>
+    <style>
+      :root {
+        --bg-color: white;
+        --recurse-green: #3dc06c;
+        --main-txt-color: black;
+        --break-sm: 450px;
+        --break-md: 800px;
+        --break-lg: 1200px;
+      }
+
+      #me {
+        transform: scaleX(-1);
+      }
+
+      video {
+        border: 1px black solid;
+        width: 50%;
+        margin: 10px;
+        height: 300px;
+      }
+
+      .title {
+        display: inline;
+        color: var(--recurse-green);
+      }
+
+      img.title {
+        width: 50px;
+        height: 50px;
+      }
+
+      html {
+        height: 100vh;
+      }
+      body {
+        min-height: 100vh;
+        box-sizing: border-box;
+
+        margin: 0;
+        padding: 1em 0 0.5em 0;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .content .buttons {
+        margin-top: 1em;
+      }
+
+      .videos {
+        display: flex;
+        text-align: center;
+        flex-direction: row;
+      }
+    </style>
+  </head>
+  <body>
+    <marquee scrollamount="4" direction="right">
+      <h1 class="title">Recurse Roulette</h1>
+      <img
+        class="title"
+        src="https://d29xw0ra2h4o4u.cloudfront.net/assets/logo_square-051508b5ecf8868635aea567bb86f423f4d1786776e5dfce4adf2bc7edf05804.png"
+    /></marquee>
+
+    <div class="content">
+      <!-- video streams -->
+      <div class="videos">
+        <!--Video stream for me-->
+        <video id="me" autoplay="autoplay" muted></video>
+
+        <!--Video stream for connect peer-->
+        <video id="you" autoplay="autoplay"></video>
+      </div>
+
+      <!-- buttons -->
+      <div class="buttons">
+        <!--Join the queue-->
+        <button id="connect">Join</button>
+        <!--End the call-->
+        <button id="close">Hangup</button>
+      </div>
+    </div>
+
+    <marquee>
+      Social Rules: 1. No well-actually’s 2. No feigning surprise 3. No backseat
+      driving 4. No subtle -isms GOT IT?????
+    </marquee>
+
+    <script>
+      const me = document.querySelector("#me");
+      const you = document.querySelector("#you");
+      let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall;
+
+      document
+        .querySelector("#connect")
+        .addEventListener("click", makeConnection);
+
+      document.querySelector("#close").addEventListener("click", () => {
+        if (you.srcObject === null) {
+          return false;
+        }
+
+        peerCall.close();
+        console.log("Initiating hangup");
+
+        you.srcObject = null;
+        document.querySelector("#connect").removeAttribute("disabled");
+      });
+
+      //fetches an available peer from the API endpoint
+      async function startRoulette() {
+        const getPeers = await fetch("/api/peers");
+        const availablePeers = new Set(await getPeers.json());
+
+        availablePeers.delete(myPeerID);
+
+        const firstAvailablePeer = availablePeers.values().next().value;
+        peerCall = peer.call(firstAvailablePeer, stream);
+
+        peerCall.on("stream", handleStream);
+        peerCall.on("close", handleClose);
+      }
+
+      async function makeConnection() {
+        document.querySelector("#connect").disabled = true;
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true
+        });
+        console.log(stream);
+        me.srcObject = stream;
+        me.play();
+
+        peer = new Peer({
+          host: location.hostname,
+          port: location.port,
+          path: "/peer"
+        });
+
+        // connect to the signaling server
+        peer.on("open", function(id) {
+          myPeerID = id;
+          console.log("Opening conection to PeerJS", id);
+
+          waitForPeer = setInterval(startRoulette, 1000);
+        });
+
+        peer.on("call", async function(call) {
+          peerCall = call;
+
+          if (you.srcObject !== null) {
+            console.log("call received, no srcObject");
+            return false;
+          }
+
+          console.log("Receiving call");
+
+          // answer the call
+          peerCall.answer(stream);
+          peerCall.on("stream", handleStream);
+          peerCall.on("close", handleClose);
+        });
+      }
+      
+      async function handleStream(remoteStream) {
+        you.srcObject = remoteStream;
+        await fetch(`/api/peers/consume/${myPeerID}`);
+        clearInterval(waitForPeer);
+      }
+
+      function handleClose() {
+        you.srcObject = null;
+        document.querySelector("#connect").removeAttribute("disabled");
+        console.log("Connection closed");
+      }
+    </script>
+  </body>
+</html>
