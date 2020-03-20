@@ -45,8 +45,7 @@ app.use(
   })
 );
 
-app.get("/", function(req, res) {
-  console.log(req.session.token);
+app.get("/", function(req, res) {  
   if (!req.session.token) {
     res.redirect("/auth");
   } else {
