@@ -38,8 +38,8 @@
         <div class="flex-column">
           <video class="mb-3" id="me" autoplay="autoplay" muted></video>
           <div class="flex-row">
-            <button class="button mx-3 mb-3" id="mute">Mute</button>
-            <button class="button mb-3" id="camera">Camera</button>
+            <button class="button mx-3 mb-3" id="muteButton">Mute</button>
+            <button class="button mb-3" id="videoButton">Stop Video</button>
           </div>
         </div>
         <div class="flex-column">
@@ -142,32 +142,36 @@
         console.log("Connection closed");
       }
       //event listener for the mute button
-      document
-        .querySelector("#mute")
-        .addEventListener("click", () => modifyStream("audio"));
+      document.querySelector("#muteButton").addEventListener("click", () => {
+        modifyStream("audio", event.target);
+      });
 
-      //event listener for the camera button
+      //event listener for the video button
       document
-        .querySelector("#camera")
-        .addEventListener("click", () => modifyStream("video"));
+        .querySelector("#videoButton")
+        .addEventListener("click", () => modifyStream("video", event.target));
 
-      //event handlers for the mute and camera buttons
-      function modifyStream(streamName) {
+      //event handlers for the mute and video buttons
+      //streamName can be "video" or "audio"
+      function modifyStream(streamName, target) {
         if (!stream) {
           return false;
-        } else {
-          //finds if the specified stream is enabled
-          let isEnabled = stream
-            .getTracks()
-            .filter(stream => stream.kind === streamName)[0].enabled;
-
-          //toggles the stream by directly modifies the stream object
-          stream
-            .getTracks()
-            .filter(
-              stream => stream.kind === streamName
-            )[0].enabled = !isEnabled;
         }
+        //finds if the specified stream is enabled
+        let isEnabled = stream
+          .getTracks()
+          .filter(stream => stream.kind === streamName)[0].enabled;
+
+        //toggles the stream by directly modifies the stream object
+        stream
+          .getTracks()
+          .filter(stream => stream.kind === streamName)[0].enabled = !isEnabled;
+
+        //edits the HTML of the target
+        if (streamName === "audio") {
+          target.innerHTML = `${isEnabled ? "Unmute" : "Mute"}`;
+        } else if (streamName === "video")
+          target.innerHTML = `${isEnabled ? "Start" : "Stop"} Video`;
       }
     </script>
   </body>
