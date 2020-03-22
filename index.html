@@ -141,6 +141,34 @@
         document.querySelector("#connect").removeAttribute("disabled");
         console.log("Connection closed");
       }
+      //event listener for the mute button
+      document
+        .querySelector("#mute")
+        .addEventListener("click", () => modifyStream("audio"));
+
+      //event listener for the camera button
+      document
+        .querySelector("#camera")
+        .addEventListener("click", () => modifyStream("video"));
+
+      //event handlers for the mute and camera buttons
+      function modifyStream(streamName) {
+        if (!stream) {
+          return false;
+        } else {
+          //finds if the specified stream is enabled
+          let isEnabled = stream
+            .getTracks()
+            .filter(stream => stream.kind === streamName)[0].enabled;
+
+          //toggles the stream by directly modifies the stream object
+          stream
+            .getTracks()
+            .filter(
+              stream => stream.kind === streamName
+            )[0].enabled = !isEnabled;
+        }
+      }
     </script>
   </body>
 </html>
