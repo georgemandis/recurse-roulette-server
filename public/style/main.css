@@ -97,6 +97,11 @@ video {
   transform: scaleX(-1);
 }
 
+#peerMutedSpan {
+  color: red;
+  display: none;
+}
+
 nav {
   background-color: #3dc06c;
   color: #2a2d2d;

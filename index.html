@@ -42,9 +42,12 @@
             <button class="button mb-3" id="videoButton">Stop Video</button>
           </div>
         </div>
-        <div class="flex-column">
+        <div>
           <!--Video stream for connect peer-->
-          <video class="mb-3" id="you" autoplay="autoplay"></video>
+          <div class="flex-column">
+            <video class="mb-3" id="you" autoplay="autoplay"></video>
+            <span id="peerMutedSpan">Muted</span>
+          </div>
         </div>
       </div>
 
@@ -152,8 +155,15 @@
       }
 
       function handleConnection(data) {
-        console.log("Received", data);
+        if (data.muted) {
+          peerMutedSpan.style.display = "block";
+        } else {
+          peerMutedSpan.style.display = "none";
+        }
       }
+
+      //query selector for peer muted button
+      const peerMutedSpan = document.querySelector("#peerMutedSpan");
 
       //event listener for the mute button
       document.querySelector("#muteButton").addEventListener("click", () => {
@@ -184,7 +194,7 @@
         //edits the HTML of the target
         if (streamName === "audio") {
           target.innerHTML = `${isEnabled ? "Unmute" : "Mute"}`;
-          peerConn.send("mute button was toggled");
+          peerConn.send({ muted: isEnabled });
         } else if (streamName === "video")
           target.innerHTML = `${isEnabled ? "Start" : "Stop"} Video`;
       }
