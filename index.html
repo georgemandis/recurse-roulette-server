@@ -57,7 +57,7 @@
     <script>
       const me = document.querySelector("#me");
       const you = document.querySelector("#you");
-      let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall;
+      let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall, peerConn;
 
       document
         .querySelector("#connect")
@@ -69,6 +69,7 @@
         }
 
         peerCall.close();
+        peerConn.close();
         console.log("Initiating hangup");
 
         you.srcObject = null;
@@ -84,9 +85,11 @@
 
         const firstAvailablePeer = availablePeers.values().next().value;
         peerCall = peer.call(firstAvailablePeer, stream);
+        peerConn = peer.connect(firstAvailablePeer);
 
         peerCall.on("stream", handleStream);
         peerCall.on("close", handleClose);
+        peerConn.on("data", handleConnection);
       }
 
       async function makeConnection() {
@@ -96,6 +99,7 @@
           audio: true
         });
         console.log(stream);
+
         me.srcObject = stream;
         me.play();
 
@@ -113,6 +117,12 @@
           waitForPeer = setInterval(startRoulette, 1000);
         });
 
+        //make connection to peer
+        peer.on("connection", function(conn) {
+          peerConn = conn;
+          peerConn.on("data", handleConnection);
+        });
+
         peer.on("call", async function(call) {
           peerCall = call;
 
@@ -122,7 +132,6 @@
           }
 
           console.log("Receiving call");
-
           // answer the call
           peerCall.answer(stream);
           peerCall.on("stream", handleStream);
@@ -141,6 +150,11 @@
         document.querySelector("#connect").removeAttribute("disabled");
         console.log("Connection closed");
       }
+
+      function handleConnection(data) {
+        console.log("Received", data);
+      }
+
       //event listener for the mute button
       document.querySelector("#muteButton").addEventListener("click", () => {
         modifyStream("audio", event.target);
@@ -170,6 +184,7 @@
         //edits the HTML of the target
         if (streamName === "audio") {
           target.innerHTML = `${isEnabled ? "Unmute" : "Mute"}`;
+          peerConn.send("mute button was toggled");
         } else if (streamName === "video")
           target.innerHTML = `${isEnabled ? "Start" : "Stop"} Video`;
       }
