@@ -8,6 +8,7 @@
   box-sizing: border-box;
   text-decoration: none;
   font-weight: 400;
+  font-size: 0.75em;
   color: $secondary-color;
   border-color: $primary-color;
   background-color: $primary-color;
@@ -23,8 +24,12 @@
     border-color: $primary-color;
     background-color: $primary-color;
   }
-  &:active {
-    border-color: $primary-color;
+  &:disabled {
+    border-color: $gray;
+    background-color: $gray;
+    &:hover {
+      font-weight: normal;
+    }
   }
   @media screen and (max-width: $medium) {
      display: block;

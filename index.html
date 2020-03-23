@@ -22,24 +22,39 @@
       </div>
     </nav>
 
-    <div class="content vertical-center">
+    <div class="content flex-column vertical-center">
       <h1 class="title mb-3">Recurse Roulette</h1>
-
-      <!-- video streams -->
-      <div class="video-container">
-        <!--Video stream for me-->
-        <video class="mb-3" id="me" autoplay="autoplay" muted></video>
-        <!--Video stream for connect peer-->
-        <video class="mb-3" id="you" autoplay="autoplay"></video>
-      </div>
-
-      <!-- buttons -->
-      <div class="button-container mb-3">
+      <!-- Join and End Call buttons -->
+      <div class="flex-row mb-3">
         <!--Join the queue-->
         <button class="button mx-3" id="connect">Join</button>
         <!--End the call-->
         <button class="button" id="close">Hangup</button>
       </div>
+
+      <!-- video streams -->
+      <div class="flex-row">
+        <!--Video stream for me-->
+        <div class="flex-column">
+          <video class="mb-3" id="me" autoplay="autoplay" muted></video>
+          <div class="flex-row">
+            <button class="button mx-3 mb-3" disabled id="muteButton">
+              Mute
+            </button>
+            <button class="button mb-3" disabled id="videoButton">
+              Stop Video
+            </button>
+          </div>
+        </div>
+        <div>
+          <!--Video stream for connect peer-->
+          <div class="flex-column">
+            <video class="mb-3" id="you" autoplay="autoplay"></video>
+            <span id="peerMutedSpan">Muted</span>
+          </div>
+        </div>
+      </div>
+
       <marquee class="mb-3">
         Social Rules: 1. No well-actually’s 2. No feigning surprise 3. No
         backseat driving 4. No subtle -isms
@@ -49,22 +64,36 @@
     <script>
       const me = document.querySelector("#me");
       const you = document.querySelector("#you");
-      let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall;
+      let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall, peerConn;
 
-      document
-        .querySelector("#connect")
-        .addEventListener("click", makeConnection);
+      //query selectors used throughout code
+      const peerMutedSpan = document.querySelector("#peerMutedSpan");
+      const muteButton = document.querySelector("#muteButton");
+      const videoButton = document.querySelector("#videoButton");
+      const connectButton = document.querySelector("#connect");
+      const hangupButton = document.querySelector("#close");
 
-      document.querySelector("#close").addEventListener("click", () => {
+      //Button Event Listeners
+      connectButton.addEventListener("click", makeConnection);
+      //mute and audio buttons
+      muteButton.addEventListener("click", () => {
+        modifyStream("audio", event.target);
+      });
+      videoButton.addEventListener("click", () =>
+        modifyStream("video", event.target)
+      );
+
+      hangupButton.addEventListener("click", () => {
         if (you.srcObject === null) {
           return false;
         }
 
         peerCall.close();
+        peerConn.close();
         console.log("Initiating hangup");
 
         you.srcObject = null;
-        document.querySelector("#connect").removeAttribute("disabled");
+        connectButton.removeAttribute("disabled");
       });
 
       //fetches an available peer from the API endpoint
@@ -76,18 +105,24 @@
 
         const firstAvailablePeer = availablePeers.values().next().value;
         peerCall = peer.call(firstAvailablePeer, stream);
+        peerConn = peer.connect(firstAvailablePeer);
 
         peerCall.on("stream", handleStream);
         peerCall.on("close", handleClose);
+        peerConn.on("data", handleConnection);
       }
 
       async function makeConnection() {
-        document.querySelector("#connect").disabled = true;
+        connectButton.disabled = true;
+        muteButton.removeAttribute("disabled");
+        videoButton.removeAttribute("disabled");
+
         stream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true
         });
         console.log(stream);
+
         me.srcObject = stream;
         me.play();
 
@@ -103,6 +138,12 @@
           console.log("Opening conection to PeerJS", id);
 
           waitForPeer = setInterval(startRoulette, 1000);
+        });
+
+        //make connection to peer
+        peer.on("connection", function(conn) {
+          peerConn = conn;
+          peerConn.on("data", handleConnection);
         });
 
         peer.on("call", async function(call) {
@@ -130,8 +171,46 @@
 
       function handleClose() {
         you.srcObject = null;
-        document.querySelector("#connect").removeAttribute("disabled");
+        connectButton.removeAttribute("disabled");
         console.log("Connection closed");
+      }
+
+      function handleConnection(data) {
+        if (data.isMuted) {
+          peerMutedSpan.style.display = "block";
+        } else {
+          peerMutedSpan.style.display = "none";
+        }
+      }
+
+      //event handlers for the mute and video buttons
+      //streamName can be "video" or "audio"
+      function modifyStream(streamName, target) {
+        if (!stream) {
+          return false;
+        }
+        //finds if the specified stream is enabled
+        let isEnabled = stream
+          .getTracks()
+          .filter(stream => stream.kind === streamName)[0].enabled;
+
+        //flips the value of isEnabled
+        let isCurrentlyEnabled = !isEnabled;
+
+        //toggles the stream by directly modifying the stream object
+        stream
+          .getTracks()
+          .filter(
+            stream => stream.kind === streamName
+          )[0].enabled = isCurrentlyEnabled;
+
+        //edits the HTML of the target
+        if (streamName === "audio") {
+          target.innerHTML = `${isCurrentlyEnabled ? "Mute" : "Unmute"}`;
+          //if the audio stream is enabled, the user is not muted. So flip the value of isCurrentlyEnabled.
+          peerConn.send({ isMuted: !isCurrentlyEnabled });
+        } else if (streamName === "video")
+          target.innerHTML = `${isCurrentlyEnabled ? "Stop" : "Start"} Video`;
       }
     </script>
   </body>

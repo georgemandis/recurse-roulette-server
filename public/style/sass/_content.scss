@@ -25,42 +25,42 @@ a {
   color: $primary-color;
 }
 
-.content {
-  width: 80%;
+//flex divs
+.flex-column {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.video-container {
-  width: 100%;
-  @media screen and (min-width: $medium) {
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-    justify-content: center;
-  }
-}
-
-.button-container {
+.flex-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: row;
   justify-content: center;
+  flex-wrap: wrap;
+}
+
+.content {
+  width: 80%;
 }
 
 video {
   border: 1px $secondary-color solid;
-  width: 50%;
   margin: 0 10px;
-  height: 400px;
+  width: 450px;
   @media screen and (max-width: $medium) {
-    height: 200px;
-    width: 100%;
     margin: 0;
+  }
+  @media screen and (max-width: $small) {
+    width: 100%;
   }
 }
 
 #me {
   transform: scaleX(-1);
+}
+
+#peerMutedSpan {
+  color: red;
+  display: none;
 }
