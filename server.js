@@ -67,7 +67,7 @@ app.get("/callback", async function(req, res) {
     res.redirect("/");
   } catch (error) {
     console.log("Access Token Error", error.message);
-    res.send("Error creating token");
+    res.send("Error creating token: "+ error.message);
   }
   0;
 });
