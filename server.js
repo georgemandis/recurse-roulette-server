@@ -85,7 +85,7 @@ app.get("/auth", async function(req, res) {
 });
 
 app.get("/api/peers", function(req, res) {
-  console.log(peers);
+  console.log(`peers: '${JSON.stringify(peers)}'`);
   return res.json(Array.from(peers));
 });
 
