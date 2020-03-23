@@ -33,7 +33,7 @@ const peerServer = ExpressPeerServer(server, options);
 const peers = new Set();
 
 app.use("/", express.static("public"));
-//app.set("trust proxy", 1);
+app.set("trust proxy", 1);
 app.use("/peer", peerServer);
 
 //sessions to remember once a person has authenticated
