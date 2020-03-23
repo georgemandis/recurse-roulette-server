@@ -7,6 +7,7 @@
   box-sizing: border-box;
   text-decoration: none;
   font-weight: 400;
+  font-size: 0.75em;
   color: #2a2d2d;
   border-color: #3dc06c;
   background-color: #3dc06c;
@@ -23,8 +24,12 @@
   border-color: #3dc06c;
   background-color: #3dc06c;
 }
-.button:active {
-  border-color: #3dc06c;
+.button:disabled {
+  border-color: #ccc;
+  background-color: #ccc;
+}
+.button:disabled:hover {
+  font-weight: normal;
 }
 @media screen and (max-width: 800px) {
   .button {

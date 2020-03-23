@@ -38,8 +38,12 @@
         <div class="flex-column">
           <video class="mb-3" id="me" autoplay="autoplay" muted></video>
           <div class="flex-row">
-            <button class="button mx-3 mb-3" id="muteButton">Mute</button>
-            <button class="button mb-3" id="videoButton">Stop Video</button>
+            <button class="button mx-3 mb-3" disabled id="muteButton">
+              Mute
+            </button>
+            <button class="button mb-3" disabled id="videoButton">
+              Stop Video
+            </button>
           </div>
         </div>
         <div>
@@ -62,11 +66,24 @@
       const you = document.querySelector("#you");
       let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall, peerConn;
 
-      document
-        .querySelector("#connect")
-        .addEventListener("click", makeConnection);
+      //query selectors used throughout code
+      const peerMutedSpan = document.querySelector("#peerMutedSpan");
+      const muteButton = document.querySelector("#muteButton");
+      const videoButton = document.querySelector("#videoButton");
+      const connectButton = document.querySelector("#connect");
+      const hangupButton = document.querySelector("#close");
 
-      document.querySelector("#close").addEventListener("click", () => {
+      //Button Event Listeners
+      connectButton.addEventListener("click", makeConnection);
+      //mute and audio buttons
+      muteButton.addEventListener("click", () => {
+        modifyStream("audio", event.target);
+      });
+      videoButton.addEventListener("click", () =>
+        modifyStream("video", event.target)
+      );
+
+      hangupButton.addEventListener("click", () => {
         if (you.srcObject === null) {
           return false;
         }
@@ -76,7 +93,7 @@
         console.log("Initiating hangup");
 
         you.srcObject = null;
-        document.querySelector("#connect").removeAttribute("disabled");
+        connectButton.removeAttribute("disabled");
       });
 
       //fetches an available peer from the API endpoint
@@ -96,7 +113,10 @@
       }
 
       async function makeConnection() {
-        document.querySelector("#connect").disabled = true;
+        connectButton.disabled = true;
+        muteButton.removeAttribute("disabled");
+        videoButton.removeAttribute("disabled");
+
         stream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true
@@ -135,6 +155,7 @@
           }
 
           console.log("Receiving call");
+
           // answer the call
           peerCall.answer(stream);
           peerCall.on("stream", handleStream);
@@ -150,30 +171,17 @@
 
       function handleClose() {
         you.srcObject = null;
-        document.querySelector("#connect").removeAttribute("disabled");
+        connectButton.removeAttribute("disabled");
         console.log("Connection closed");
       }
 
       function handleConnection(data) {
-        if (data.muted) {
+        if (data.isMuted) {
           peerMutedSpan.style.display = "block";
         } else {
           peerMutedSpan.style.display = "none";
         }
       }
-
-      //query selector for peer muted button
-      const peerMutedSpan = document.querySelector("#peerMutedSpan");
-
-      //event listener for the mute button
-      document.querySelector("#muteButton").addEventListener("click", () => {
-        modifyStream("audio", event.target);
-      });
-
-      //event listener for the video button
-      document
-        .querySelector("#videoButton")
-        .addEventListener("click", () => modifyStream("video", event.target));
 
       //event handlers for the mute and video buttons
       //streamName can be "video" or "audio"
@@ -186,17 +194,23 @@
           .getTracks()
           .filter(stream => stream.kind === streamName)[0].enabled;
 
-        //toggles the stream by directly modifies the stream object
+        //flips the value of isEnabled
+        let isCurrentlyEnabled = !isEnabled;
+
+        //toggles the stream by directly modifying the stream object
         stream
           .getTracks()
-          .filter(stream => stream.kind === streamName)[0].enabled = !isEnabled;
+          .filter(
+            stream => stream.kind === streamName
+          )[0].enabled = isCurrentlyEnabled;
 
         //edits the HTML of the target
         if (streamName === "audio") {
-          target.innerHTML = `${isEnabled ? "Unmute" : "Mute"}`;
-          peerConn.send({ muted: isEnabled });
+          target.innerHTML = `${isCurrentlyEnabled ? "Mute" : "Unmute"}`;
+          //if the audio stream is enabled, the user is not muted. So flip the value of isCurrentlyEnabled.
+          peerConn.send({ isMuted: !isCurrentlyEnabled });
         } else if (streamName === "video")
-          target.innerHTML = `${isEnabled ? "Start" : "Stop"} Video`;
+          target.innerHTML = `${isCurrentlyEnabled ? "Stop" : "Start"} Video`;
       }
     </script>
   </body>
