@@ -84,6 +84,13 @@ video {
     width: 100%;
   }
 }
+video.loading {
+  background: #3dc06c url("../media/loading.gif") no-repeat center;
+  background-size: auto;
+  -webkit-background-size: auto;
+  -moz-background-size: auto;
+  -o-background-size: auto;
+}
 
 #me {
   transform: scaleX(-1);
@@ -113,7 +120,7 @@ nav a:hover {
 }
 
 .logo {
-  width: 30px;
+  width: 25px;
   height: auto;
 }
 

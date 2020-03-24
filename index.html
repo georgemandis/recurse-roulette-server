@@ -153,6 +153,7 @@
 
       async function makeConnection() {
         connectButton.disabled = true;
+        you.classList.add("loading");
         muteButton.removeAttribute("disabled");
         videoButton.removeAttribute("disabled");
 
@@ -208,6 +209,7 @@
       }
 
       async function handleStream(remoteStream) {
+        you.classList.remove("loading");
         you.srcObject = remoteStream;
         await fetch(`/api/peers/consume/${myPeerID}`);
         clearInterval(waitForPeer);

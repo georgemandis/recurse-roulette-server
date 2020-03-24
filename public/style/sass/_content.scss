@@ -36,6 +36,13 @@ video {
   @media screen and (max-width: $small) {
     width: 100%;
   }
+  &.loading {
+    background: $primary-color url("../media/loading.gif") no-repeat center;
+    background-size: auto;
+    -webkit-background-size: auto;
+    -moz-background-size: auto;
+    -o-background-size: auto;
+  }
 }
 
 #me {
