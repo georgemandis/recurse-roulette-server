@@ -25,12 +25,13 @@ const credentials = {
 const oauth2 = require("simple-oauth2").create(credentials);
 
 const options = {
-  debug: false,
+  debug: false
   //path: '/'
 };
 
 const peerServer = ExpressPeerServer(server, options);
 const peers = new Set();
+const allPeers = new Set();
 
 app.use("/", express.static("public"));
 app.set("trust proxy", 1);
@@ -70,7 +71,7 @@ app.get("/callback", async function(req, res) {
     res.redirect("/");
   } catch (error) {
     console.log("Access Token Error", error.message);
-    res.send("Error creating token: "+ error.message);
+    res.send("Error creating token: " + error.message);
   }
   0;
 });
@@ -99,12 +100,30 @@ app.get("/api/peers/consume/:id", function(req, res) {
   });
 });
 
+// Client should send add own id to this endpoint
+// if they've already been given a peer ID and simply
+// want to rejoin the queue.
+app.get("/api/peers/add/:id", function(req, res) {
+  const addedPeer = req.params.id;
+  const result = peers.add(addedPeer);
+  return res.json({
+    success: result
+  });
+});
+
+app.get("/api/online", function(req, res) {
+  console.log(`online: '${JSON.stringify(allPeers)}'`);
+  return res.json(allPeers.size);
+});
+
 peerServer.on("connection", function(id) {
   peers.add(id);
+  allPeers.add(id);
   console.log(`${id} connected`);
 });
 
 peerServer.on("disconnect", function(id) {
   peers.delete(id);
+  allPeers.delete(id);
   console.log(`${id} disconnected`);
 });

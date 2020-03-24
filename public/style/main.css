@@ -59,6 +59,7 @@ a {
 }
 
 .title {
+  margin: 0;
   display: inline;
   font-family: "Libre Baskerville", "Georgia", serif;
   color: #3dc06c;
@@ -133,19 +134,27 @@ nav a:hover {
   margin: 0 auto;
 }
 
-.mt-3, .my-3, .m-3 {
+.mt-3,
+.my-3,
+.m-3 {
   margin-top: 15px;
 }
 
-.mb-3, .my-3, .m-3 {
+.mb-3,
+.my-3,
+.m-3 {
   margin-bottom: 15px;
 }
 
-.ml-3, .mx-3, .m-3 {
+.ml-3,
+.mx-3,
+.m-3 {
   margin-left: 15px;
 }
 
-.mr-3, .mx-3, .m-3 {
+.mr-3,
+.mx-3,
+.m-3 {
   margin-right: 15px;
 }
 

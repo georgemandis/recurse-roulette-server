@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recurse Roulette</title>
     <script src="/js/peerjs.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" type="text/css" href="style/main.css" />
   </head>
   <body>
@@ -22,8 +26,9 @@
       </div>
     </nav>
 
-    <div class="content flex-column vertical-center">
-      <h1 class="title mb-3">Recurse Roulette</h1>
+    <div class="content flex-column vertical-center my-3">
+      <h1 class="title my-3">Recurse Roulette</h1>
+      <h3 class="title mb-3" id="onlinePeers">--</h3>
       <!-- Join and End Call buttons -->
       <div class="flex-row mb-3">
         <!--Join the queue-->
@@ -56,8 +61,9 @@
       </div>
 
       <marquee class="mb-3">
-        Social Rules: 1. No well-actually’s 2. No feigning surprise 3. No
-        backseat driving 4. No subtle -isms
+        <strong>Social Rules</strong>: 1. No well-actually’s &nbsp;&nbsp; 2. No
+        feigning surprise &nbsp;&nbsp; 3. No backseat driving &nbsp;&nbsp; 4. No
+        subtle -isms
       </marquee>
     </div>
 
@@ -73,10 +79,19 @@
 
       //query selectors used throughout code
       const peerMutedSpan = document.querySelector("#peerMutedSpan");
+      const onlinePeersSpan = document.querySelector("#onlinePeers");
+      //buttons
       const muteButton = document.querySelector("#muteButton");
       const videoButton = document.querySelector("#videoButton");
       const connectButton = document.querySelector("#connect");
       const hangupButton = document.querySelector("#close");
+
+      const checkForOnlinePeers = setInterval(async () => {
+        const currentOnlinePeers = await (await fetch("/api/online")).json();
+        onlinePeersSpan.textContent = `${currentOnlinePeers} Recurser${
+          currentOnlinePeers === 1 ? "" : "s"
+        } Online`;
+      }, 1000);
 
       //Button Event Listeners
       connectButton.addEventListener("click", makeConnection);
@@ -124,26 +139,30 @@
         muteButton.removeAttribute("disabled");
         videoButton.removeAttribute("disabled");
 
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true
-        });
-        console.log(stream);
+        if (!peer) {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+          });
+          console.log(stream);
 
-        me.srcObject = stream;
-        me.play();
+          me.srcObject = stream;
+          me.play();
 
-        peer = new Peer({
-          host: location.hostname,
-          port: location.port,
-          path: "/peer"
-        });
+          peer = new Peer({
+            host: location.hostname,
+            port: location.port,
+            path: "/peer"
+          });
+        } else {
+          await fetch(`/api/peers/add/${myPeerID}`);
+          waitForPeer = setInterval(startRoulette, 1000);
+        }
 
         // connect to the signaling server
         peer.on("open", function(id) {
           myPeerID = id;
           console.log("Opening conection to PeerJS", id);
-
           waitForPeer = setInterval(startRoulette, 1000);
         });
 
