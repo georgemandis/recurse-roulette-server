@@ -1,13 +1,15 @@
-@charset "UTF-8";
+/* Button Styles */
+/* source https://fdossena.com/?p=html5cool/buttons/i.frag */
 .button {
   display: inline-block;
-  border-radius: 2em;
-  padding: 0.5em 3em;
-  border: 0.16em solid #3dc06c;
+  min-width: 130px;
+  border-radius: 10px;
+  padding: 7.5px 15px;
+  border: 2px solid #3dc06c;
   box-sizing: border-box;
   text-decoration: none;
   font-weight: 400;
-  font-size: 0.75em;
+  font-size: 0.8em;
   color: #2a2d2d;
   border-color: #3dc06c;
   background-color: #3dc06c;
@@ -25,18 +27,20 @@
   background-color: #3dc06c;
 }
 .button:disabled {
+  cursor: auto;
   border-color: #ccc;
   background-color: #ccc;
 }
 .button:disabled:hover {
   font-weight: normal;
 }
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 450px) {
   .button {
-     display: block;
+    min-width: 100px;
   }
 }
 
+/* Page Styles */
 html {
   font-size: 1.125em;
   color: #2a2d2d;
@@ -50,47 +54,29 @@ body {
   margin: 0;
 }
 
-h1 {
-  text-align: center;
-}
-
-a {
-  color: #3dc06c;
-}
-
 .title {
   margin: 0;
-  display: inline;
   font-family: "Libre Baskerville", "Georgia", serif;
   color: #3dc06c;
 }
 
-.flex-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.flex-row {
-  display: flex;
-  align-items: flex-start;
-  flex-direction: row;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
 .content {
   width: 80%;
+  margin: 0 auto;
 }
 
 video {
   border: 1px #2a2d2d solid;
-  margin: 0 10px;
+  border-radius: 10px;
+  /* 4:3 aspect ratio for large screen */
   width: 450px;
+  height: 337.5px;
+  margin: 0 7.5px;
 }
 @media screen and (max-width: 800px) {
   video {
     margin: 0;
+    height: 200px;
   }
 }
 @media screen and (max-width: 450px) {
@@ -108,6 +94,7 @@ video {
   display: none;
 }
 
+/* Nav Styles */
 nav {
   background-color: #3dc06c;
   color: #2a2d2d;
@@ -130,32 +117,39 @@ nav a:hover {
   height: auto;
 }
 
-.vertical-center {
-  margin: 0 auto;
-}
-
-.mt-3,
-.my-3,
-.m-3 {
+/* Utilites */
+/* margin classes */
+.margin-top, .margin-y, .margin {
   margin-top: 15px;
 }
 
-.mb-3,
-.my-3,
-.m-3 {
+.margin-bottom, .margin-y, .margin {
   margin-bottom: 15px;
 }
 
-.ml-3,
-.mx-3,
-.m-3 {
+.margin-x, .margin {
   margin-left: 15px;
+  margin-right: 15px;
 }
 
-.mr-3,
-.mx-3,
-.m-3 {
-  margin-right: 15px;
+.margin-x-small {
+  margin-left: 7.5px;
+  margin-right: 7.5px;
+}
+
+/*flex divs */
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flex-row {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 /*# sourceMappingURL=main.css.map */

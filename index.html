@@ -14,12 +14,12 @@
   </head>
   <body>
     <nav>
-      <a class="mx-3" href="/">
+      <a class="margin-x" href="/">
         <img class="logo" src="media/logo.svg" />
       </a>
       <div class="nav-container">
         <a
-          class="nav-link mx-3"
+          class="nav-link margin-x"
           target="_blank"
           href="https://github.com/georgemandis/recurse-roulette-server"
           >Github</a
@@ -27,41 +27,58 @@
       </div>
     </nav>
 
-    <div class="content flex-column vertical-center my-3">
-      <h1 class="title my-3">Recurse Roulette</h1>
-      <h3 class="title mb-3" id="onlinePeers">--</h3>
+    <div class="content flex-column vertical-center margin-y">
+      <h1 class="title margin-y">Recurse Roulette</h1>
+      <h3 class="title margin-bottom" id="onlinePeers">--</h3>
       <!-- Join and End Call buttons -->
-      <div class="flex-row mb-3">
+      <div class="flex-row">
         <!--Join the queue-->
-        <button class="button mx-3" id="connect">Join</button>
+        <button class="button margin-bottom margin-x-small" id="connect">
+          Join
+        </button>
         <!--End the call-->
-        <button class="button" id="close">Hangup</button>
+        <button class="button margin-bottom margin-x-small" id="close" disabled>
+          Hang Up
+        </button>
       </div>
 
       <!-- video streams -->
-      <div class="flex-row"> 
+      <div class="flex-row">
         <!--Video stream for me-->
-        <div class="flex-column">          
-          <video class="mb-3" id="me" autoplay="autoplay" muted></video>
+        <div class="flex-column">
+          <video
+            class="margin-bottom"
+            id="me"
+            autoplay="autoplay"
+            muted
+          ></video>
           <div class="flex-row">
-            <button class="button mx-3 mb-3" disabled id="muteButton">
+            <button
+              class="button margin-bottom margin-x-small"
+              disabled
+              id="muteButton"
+            >
               Mute
             </button>
-            <button class="button mb-3" disabled id="videoButton">
+            <button
+              class="button margin-bottom margin-x-small"
+              disabled
+              id="videoButton"
+            >
               Stop Video
             </button>
           </div>
         </div>
+        <!--Video stream for connect peer-->
         <div>
-          <!--Video stream for connect peer-->
           <div class="flex-column">
-            <video class="mb-3" id="you" autoplay="autoplay"></video>
+            <video class="margin-bottom" id="you" autoplay="autoplay"></video>
             <span id="peerMutedSpan">Muted</span>
           </div>
         </div>
       </div>
 
-      <marquee class="mb-3">
+      <marquee class="margin-y">
         <strong>Social Rules</strong>: 1. No well-actually’s &nbsp;&nbsp; 2. No
         feigning surprise &nbsp;&nbsp; 3. No backseat driving &nbsp;&nbsp; 4. No
         subtle -isms
@@ -74,8 +91,7 @@
       let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall, peerCon;
 
       let state = {
-        isMuted: false,
-        filter: null
+        isMuted: false
       };
 
       //query selectors used throughout code
@@ -199,11 +215,18 @@
 
       function handleClose() {
         you.srcObject = null;
+        //remove muted span for peer
+        peerMutedSpan.style.display = "none";
+        //disable hangup button, enable connect button
+        hangupButton.disabled = true;
         connectButton.removeAttribute("disabled");
         console.log("Connection closed");
       }
 
       function handleConnection(data) {
+        //enable hangup button
+        hangupButton.removeAttribute("disabled");
+
         if (data.isMuted) {
           peerMutedSpan.style.display = "block";
         } else {
@@ -244,21 +267,22 @@
           target.innerHTML = `${isCurrentlyEnabled ? "Stop" : "Start"} Video`;
         }
       }
-      
-      (()=>{
-        const bill = new Konami(()=>{
+
+      (() => {
+        const bill = new Konami(() => {
           const bills = [
             "billandbees.jpg",
             "billandirshmen.jpg",
             "billspace.jpg"
           ];
-          you.poster = `/media/${bills[Math.floor(Math.random()*bills.length)]}`;
+          you.poster = `/media/${
+            bills[Math.floor(Math.random() * bills.length)]
+          }`;
           clearInterval(checkForOnlinePeers);
           onlinePeersSpan.textContent = "Bill is Online";
-          const marquee = document.querySelector('marquee');
-          marquee.innerHTML = "<marquee scrollamount='20' behavior='alternate' style='width:30%;color:#00A0E6'>Gotta go fast!</marquee>";
-          // marquee.scrollDelay="10"; 
-        
+          const marquee = document.querySelector("marquee");
+          marquee.innerHTML =
+            "<marquee scrollamount='20' behavior='alternate' style='width:30%;color:#00A0E6'>Gotta go fast!</marquee>";
         });
       })();
     </script>

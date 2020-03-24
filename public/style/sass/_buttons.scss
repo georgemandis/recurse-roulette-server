@@ -1,14 +1,15 @@
-//source https://fdossena.com/?p=html5cool/buttons/i.frag
+/* source https://fdossena.com/?p=html5cool/buttons/i.frag */
 
 .button {
   display: inline-block;
-  border-radius: 2em;
-  padding: 0.5em 3em;
-  border: 0.16em solid $primary-color;
+  min-width: 130px;
+  border-radius: 10px;
+  padding: 7.5px 15px;
+  border: 2px solid $primary-color;
   box-sizing: border-box;
   text-decoration: none;
   font-weight: 400;
-  font-size: 0.75em;
+  font-size: 0.8em;
   color: $secondary-color;
   border-color: $primary-color;
   background-color: $primary-color;
@@ -25,13 +26,14 @@
     background-color: $primary-color;
   }
   &:disabled {
+    cursor: auto;
     border-color: $gray;
     background-color: $gray;
     &:hover {
       font-weight: normal;
     }
   }
-  @media screen and (max-width: $medium) {
-     display: block;
+  @media screen and (max-width: $small) {
+    min-width: 100px;
   }
 }
