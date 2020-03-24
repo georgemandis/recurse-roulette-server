@@ -64,7 +64,12 @@
     <script>
       const me = document.querySelector("#me");
       const you = document.querySelector("#you");
-      let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall, peerConn;
+      let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall, peerCon;
+
+      let state = {
+        isMuted: false,
+        filter: null
+      };
 
       //query selectors used throughout code
       const peerMutedSpan = document.querySelector("#peerMutedSpan");
@@ -109,6 +114,8 @@
 
         peerCall.on("stream", handleStream);
         peerCall.on("close", handleClose);
+
+        peerConn.on("open", () => peerConn.send(state));
         peerConn.on("data", handleConnection);
       }
 
@@ -143,6 +150,7 @@
         //make connection to peer
         peer.on("connection", function(conn) {
           peerConn = conn;
+          peerConn.on("open", () => peerConn.send(state));
           peerConn.on("data", handleConnection);
         });
 
@@ -208,9 +216,13 @@
         if (streamName === "audio") {
           target.innerHTML = `${isCurrentlyEnabled ? "Mute" : "Unmute"}`;
           //if the audio stream is enabled, the user is not muted. So flip the value of isCurrentlyEnabled.
-          peerConn.send({ isMuted: !isCurrentlyEnabled });
-        } else if (streamName === "video")
+          let isMuted = !isCurrentlyEnabled;
+          //update state and send it to the peer
+          state.isMuted = isMuted;
+          peerConn.send(state);
+        } else if (streamName === "video") {
           target.innerHTML = `${isCurrentlyEnabled ? "Stop" : "Start"} Video`;
+        }
       }
     </script>
   </body>
