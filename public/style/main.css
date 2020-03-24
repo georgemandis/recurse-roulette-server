@@ -1,3 +1,5 @@
+/* Button Styles */
+/* source https://fdossena.com/?p=html5cool/buttons/i.frag */
 .button {
   display: inline-block;
   min-width: 130px;
@@ -38,6 +40,7 @@
   }
 }
 
+/* Page Styles */
 html {
   font-size: 1.125em;
   color: #2a2d2d;
@@ -51,42 +54,21 @@ body {
   margin: 0;
 }
 
-h1 {
-  text-align: center;
-}
-
-a {
-  color: #3dc06c;
-}
-
 .title {
   margin: 0;
-  display: inline;
   font-family: "Libre Baskerville", "Georgia", serif;
   color: #3dc06c;
 }
 
-.flex-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.flex-row {
-  display: flex;
-  align-items: flex-start;
-  flex-direction: row;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
 .content {
   width: 80%;
+  margin: 0 auto;
 }
 
 video {
   border: 1px #2a2d2d solid;
   border-radius: 10px;
+  /* 4:3 aspect ratio for large screen */
   width: 450px;
   height: 337.5px;
   margin: 0 7.5px;
@@ -112,6 +94,7 @@ video {
   display: none;
 }
 
+/* Nav Styles */
 nav {
   background-color: #3dc06c;
   color: #2a2d2d;
@@ -134,10 +117,8 @@ nav a:hover {
   height: auto;
 }
 
-.vertical-center {
-  margin: 0 auto;
-}
-
+/* Utilites */
+/* margin classes */
 .margin-top, .margin-y, .margin {
   margin-top: 15px;
 }
@@ -154,6 +135,21 @@ nav a:hover {
 .margin-x-small {
   margin-left: 7.5px;
   margin-right: 7.5px;
+}
+
+/*flex divs */
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flex-row {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 /*# sourceMappingURL=main.css.map */

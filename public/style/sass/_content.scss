@@ -4,51 +4,28 @@ html {
 }
 
 body {
-  font: 100% $font-stack;
+  font: 100% $body-font;
   background-color: $background-color;
   min-height: 100vh;
   box-sizing: border-box;
   margin: 0;
 }
 
-h1 {
-  text-align: center;
-}
-
-a {
-  color: $primary-color;
-}
-
 .title {
   margin: 0;
-  display: inline;
   font-family: $headings-font;
   color: $primary-color;
 }
 
-//flex divs
-.flex-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.flex-row {
-  display: flex;
-  align-items: flex-start;
-  flex-direction: row;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
 .content {
   width: 80%;
+  margin: 0 auto;
 }
 
 video {
   border: 1px $secondary-color solid;
   border-radius: 10px;
-  //4:3 aspect ratio for large screen
+  /* 4:3 aspect ratio for large screen */
   width: 450px;
   height: 337.5px;
   margin: 0 7.5px;
