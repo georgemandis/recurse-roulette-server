@@ -50,16 +50,16 @@ app.use(
 
 app.get("/", function(req, res) {  
   if (!req.session.token) {
-  	debug("No token, redirecting to /auth");
+  	console.log("No token, redirecting to /auth");
     res.redirect("/auth");
   } else {
-  	debug(`Found token in the session: '${req.session.token}'; sending index html`);
+  	console.log(`Found token in the session: '${req.session.token}'; sending index html`);
     res.sendFile(`${process.env.HOME}/index.html`);
   }
 });
 
 app.get("/callback", async function(req, res) {
-  debug("/callback");
+  console.log("/callback");
   const tokenConfig = {
     code: req.query.code,
     redirect_uri: process.env.REDIRECT_URI
@@ -68,10 +68,10 @@ app.get("/callback", async function(req, res) {
   try {
     const result = await oauth2.authorizationCode.getToken(tokenConfig);
     req.session.token = result.access_token;
-    debug(`set token to '${req.session.token}'`);
+    console.log(`set token to '${req.session.token}'`);
     res.redirect("/");
   } catch (error) {
-    debug("Access Token Error", error.message);
+    console.log("Access Token Error", error.message);
     res.send("Error creating token: " + error.message);
   }
 });
@@ -85,13 +85,13 @@ app.get("/auth", async function(req, res) {
   	  // Redirect example using Express (see http://expressjs.com/api.html#res.redirect)
   	  res.redirect(authorizationUri);
   } catch (error) {
-  	  debug("Auth got error", error.message);
+  	  console.log("Auth got error", error.message);
   	  res.send("Error creating token: " + error.message);
   }
 });
 
 app.get("/api/peers", function(req, res) {
-  debug(`peers: '${JSON.stringify(peers)}'`);
+  console.log(`peers: '${JSON.stringify(peers)}'`);
   return res.json(Array.from(peers));
 });
 
@@ -99,7 +99,7 @@ app.get("/api/peers", function(req, res) {
 // to be removed from the available peer list
 app.get("/api/peers/consume/:id", function(req, res) {
   const consumedPeer = req.params.id;
-  debug("consuming peer "+consumedPeer);
+  console.log("consuming peer "+consumedPeer);
   const result = peers.delete(consumedPeer);
   return res.json({
     success: result
@@ -111,7 +111,7 @@ app.get("/api/peers/consume/:id", function(req, res) {
 // want to rejoin the queue.
 app.get("/api/peers/add/:id", function(req, res) {
   const addedPeer = req.params.id;
-  debug("adding peer "+addedPeer);
+  console.log("adding peer "+addedPeer);
   const result = peers.add(addedPeer);
   return res.json({
     success: result
@@ -119,18 +119,18 @@ app.get("/api/peers/add/:id", function(req, res) {
 });
 
 app.get("/api/online", function(req, res) {
-  debug(`online: '${JSON.stringify(allPeers)}'`);
+  console.log(`online: '${JSON.stringify(allPeers)}'`);
   return res.json(allPeers.size);
 });
 
 peerServer.on("connection", function(id) {
   peers.add(id);
   allPeers.add(id);
-  debug(`${id} connected`);
+  console.log(`${id} connected`);
 });
 
 peerServer.on("disconnect", function(id) {
   peers.delete(id);
   allPeers.delete(id);
-  debug(`${id} disconnected`);
+  console.log(`${id} disconnected`);
 });
