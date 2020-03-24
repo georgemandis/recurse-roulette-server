@@ -3,24 +3,26 @@
 }
 
 //margin classes
-.mt-3 {
+.margin-top {
   margin-top: 15px;
 }
-.mb-3 {
+.margin-bottom {
   margin-bottom: 15px;
 }
-.my-3 {
-  @extend .mt-3, .mb-3;
+.margin-y {
+  @extend .margin-top, .margin-bottom;
 }
-.ml-3 {
+
+.margin-x {
   margin-left: 15px;
-}
-.mr-3 {
   margin-right: 15px;
 }
-.mx-3 {
-  @extend .ml-3, .mr-3;
+
+.margin-x-small {
+  margin-left: 7.5px;
+  margin-right: 7.5px;
 }
-.m-3 {
-  @extend .my-3, .mx-3;
+
+.margin {
+  @extend .margin-y, .margin-x;
 }

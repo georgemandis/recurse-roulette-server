@@ -47,8 +47,8 @@ a {
 
 video {
   border: 1px $secondary-color solid;
-  margin: 0 10px;
   width: 450px;
+  margin: 0 7.5px;
   @media screen and (max-width: $medium) {
     margin: 0;
   }

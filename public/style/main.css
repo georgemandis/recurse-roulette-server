@@ -1,6 +1,6 @@
-@charset "UTF-8";
 .button {
   display: inline-block;
+  min-width: 150px;
   border-radius: 2em;
   padding: 0.5em 3em;
   border: 0.16em solid #3dc06c;
@@ -30,11 +30,6 @@
 }
 .button:disabled:hover {
   font-weight: normal;
-}
-@media screen and (max-width: 800px) {
-  .button {
-     display: block;
-  }
 }
 
 html {
@@ -85,8 +80,8 @@ a {
 
 video {
   border: 1px #2a2d2d solid;
-  margin: 0 10px;
   width: 450px;
+  margin: 0 7.5px;
 }
 @media screen and (max-width: 800px) {
   video {
@@ -134,28 +129,22 @@ nav a:hover {
   margin: 0 auto;
 }
 
-.mt-3,
-.my-3,
-.m-3 {
+.margin-top, .margin-y, .margin {
   margin-top: 15px;
 }
 
-.mb-3,
-.my-3,
-.m-3 {
+.margin-bottom, .margin-y, .margin {
   margin-bottom: 15px;
 }
 
-.ml-3,
-.mx-3,
-.m-3 {
+.margin-x, .margin {
   margin-left: 15px;
+  margin-right: 15px;
 }
 
-.mr-3,
-.mx-3,
-.m-3 {
-  margin-right: 15px;
+.margin-x-small {
+  margin-left: 7.5px;
+  margin-right: 7.5px;
 }
 
 /*# sourceMappingURL=main.css.map */
