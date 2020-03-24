@@ -91,7 +91,7 @@ app.get("/auth", async function(req, res) {
 });
 
 app.get("/api/peers", function(req, res) {
-  console.log(`peers: '${JSON.stringify(peers)}'`);
+  console.log(`peers: '${JSON.stringify(Array.from(peers))}'`);
   return res.json(Array.from(peers));
 });
 
@@ -119,18 +119,18 @@ app.get("/api/peers/add/:id", function(req, res) {
 });
 
 app.get("/api/online", function(req, res) {
-  console.log(`online: '${JSON.stringify(allPeers)}'`);
+  console.log(`online: '${JSON.stringify(Array.from(allPeers))}'`);
   return res.json(allPeers.size);
 });
 
 peerServer.on("connection", function(id) {
   peers.add(id);
   allPeers.add(id);
-  console.log(`${id} connected`);
+  console.log(`*!*!*!*!* ${id} connected`);
 });
 
 peerServer.on("disconnect", function(id) {
   peers.delete(id);
   allPeers.delete(id);
-  console.log(`${id} disconnected`);
+  console.log(`*!*!*!*!* ${id} disconnected`);
 });
