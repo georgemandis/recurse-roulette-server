@@ -26,7 +26,6 @@ const oauth2 = require("simple-oauth2").create(credentials);
 
 const options = {
   debug: false
-  //path: '/'
 };
 
 const peerServer = ExpressPeerServer(server, options);

@@ -74,8 +74,7 @@
       let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall, peerCon;
 
       let state = {
-        isMuted: false,
-        filter: null
+        isMuted: false
       };
 
       //query selectors used throughout code
@@ -267,7 +266,6 @@
           const marquee = document.querySelector("marquee");
           marquee.innerHTML =
             "<marquee scrollamount='20' behavior='alternate' style='width:30%;color:#00A0E6'>Gotta go fast!</marquee>";
-          // marquee.scrollDelay="10";
         });
       })();
     </script>
