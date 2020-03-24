@@ -47,10 +47,14 @@ a {
 
 video {
   border: 1px $secondary-color solid;
+  border-radius: 10px;
+  //4:3 aspect ratio for large screen
   width: 450px;
+  height: 337.5px;
   margin: 0 7.5px;
   @media screen and (max-width: $medium) {
     margin: 0;
+    height: 200px;
   }
   @media screen and (max-width: $small) {
     width: 100%;
