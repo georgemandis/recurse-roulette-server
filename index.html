@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recurse Roulette</title>
     <script src="/js/peerjs.min.js"></script>
+    <script src="/js/konami.js"></script>
     <link
       href="https://fonts.googleapis.com/css?family=Libre+Baskerville:400,400i"
       rel="stylesheet"
@@ -38,9 +39,9 @@
       </div>
 
       <!-- video streams -->
-      <div class="flex-row">
+      <div class="flex-row"> 
         <!--Video stream for me-->
-        <div class="flex-column">
+        <div class="flex-column">          
           <video class="mb-3" id="me" autoplay="autoplay" muted></video>
           <div class="flex-row">
             <button class="button mx-3 mb-3" disabled id="muteButton">
@@ -243,6 +244,23 @@
           target.innerHTML = `${isCurrentlyEnabled ? "Stop" : "Start"} Video`;
         }
       }
+      
+      (()=>{
+        const bill = new Konami(()=>{
+          const bills = [
+            "billandbees.jpg",
+            "billandirshmen.jpg",
+            "billspace.jpg"
+          ];
+          you.poster = `/media/${bills[Math.floor(Math.random()*bills.length)]}`;
+          clearInterval(checkForOnlinePeers);
+          onlinePeersSpan.textContent = "Bill is Online";
+          const marquee = document.querySelector('marquee');
+          marquee.innerHTML = "<marquee scrollamount='20' behavior='alternate' style='width:30%;color:#00A0E6'>Gotta go fast!</marquee>";
+          // marquee.scrollDelay="10"; 
+        
+        });
+      })();
     </script>
   </body>
 </html>
