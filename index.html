@@ -121,13 +121,12 @@
       );
 
       hangupButton.addEventListener("click", () => {
-        if (you.srcObject === null) {
+        if (isConnected() == false) {
           return false;
-        }
+        } 
 
-        peerCall.close();
-        peerConn.close();
         console.log("Initiating hangup");
+        handleClose();
 
         you.srcObject = null;
         connectButton.removeAttribute("disabled");
@@ -152,32 +151,42 @@
       }
 
       async function makeConnection() {
+        //disable join button, enable mute and stop video buttons
         connectButton.disabled = true;
-        you.classList.add("loading");
         muteButton.removeAttribute("disabled");
         videoButton.removeAttribute("disabled");
-
-        if (!peer) {
+        // add loading animation
+        you.classList.add("loading");
+   
+        // initiate media stream
+        if (!me.srcObject) {
           stream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true
           });
           console.log(stream);
 
+          // put the stream to the HTML video object
           me.srcObject = stream;
           me.play();
-
-          peer = new Peer({
-            host: location.hostname,
-            port: location.port,
-            path: "/peer"
-          });
-        } else {
-          await fetch(`/api/peers/add/${myPeerID}`);
-          waitForPeer = setInterval(startRoulette, 1000);
+                   
+        } 
+        
+        if (peer === undefined || (typeof peer === 'object' && peer.destroyed)) {
+          setupPeer();
+          console.log("I have set up a peer", peer);
         }
+      }
 
-        // connect to the signaling server
+      function setupPeer() {
+        console.log("I'm going to set up a peer");
+        peer = new Peer({
+          host: location.hostname,
+          port: location.port,
+          path: "/peer" 
+        });
+
+          // connect to the signaling server
         peer.on("open", function(id) {
           myPeerID = id;
           console.log("Opening conection to PeerJS", id);
@@ -209,6 +218,7 @@
       }
 
       async function handleStream(remoteStream) {
+        // remove loading animation
         you.classList.remove("loading");
         you.srcObject = remoteStream;
         await fetch(`/api/peers/consume/${myPeerID}`);
@@ -216,10 +226,18 @@
       }
 
       function handleClose() {
+        // remote stream to the video HTML object
         you.srcObject = null;
-        //remove muted span for peer
+
+        // close the connection and DESTRUCTION to the peer
+        // (abandon all hope, ye who enter peer)
+        peerCall.close();
+        peerConn.close();
+        peer.destroy();
+
+        // remove muted span for peer
         peerMutedSpan.style.display = "none";
-        //disable hangup button, enable connect button
+        // disable hangup button, enable connect button
         hangupButton.disabled = true;
         connectButton.removeAttribute("disabled");
         console.log("Connection closed");
@@ -268,6 +286,10 @@
         } else if (streamName === "video") {
           target.innerHTML = `${isCurrentlyEnabled ? "Stop" : "Start"} Video`;
         }
+      }
+      // determine if the peer stream connected
+      function isConnected() {
+         return you.srcObject ? true : false;
       }
 
       (() => {

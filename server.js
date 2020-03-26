@@ -49,13 +49,13 @@ app.use(
 );
 
 app.get("/", function(req, res) {  
-  if (!req.session.token) {
-  	console.log("No token, redirecting to /auth");
-    res.redirect("/auth");
-  } else {
-  	console.log(`Found token in the session: '${req.session.token}'; sending index html`);
-    res.sendFile(`${process.env.HOME}/index.html`);
-  }
+  // if (!req.session.token) {
+  // 	console.log("No token, redirecting to /auth");
+  //   res.redirect("/auth");
+  // } else {
+  // 	console.log(`Found token in the session: '${req.session.token}'; sending index html`);
+    res.sendFile(`${process.cwd()}/index.html`);
+  // }
 });
 
 app.get("/callback", async function(req, res) {
