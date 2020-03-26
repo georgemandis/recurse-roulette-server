@@ -86,23 +86,26 @@
     </div>
 
     <script>
+      // video elements for the two streams
       const me = document.querySelector("#me");
       const you = document.querySelector("#you");
       let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall, peerConn;
 
+      // the state keeps track of the current user's mic
       let state = {
         isMuted: false
       };
 
-      //query selectors used throughout code
+      // query selectors used throughout code
       const peerMutedSpan = document.querySelector("#peerMutedSpan");
       const onlinePeersSpan = document.querySelector("#onlinePeers");
-      //buttons
+      // buttons query selectors
       const muteButton = document.querySelector("#muteButton");
       const videoButton = document.querySelector("#videoButton");
       const connectButton = document.querySelector("#connect");
       const hangupButton = document.querySelector("#close");
 
+      // updates how many peers are online eveyr second
       const checkForOnlinePeers = setInterval(async () => {
         const currentOnlinePeers = await (await fetch("/api/online")).json();
         onlinePeersSpan.textContent = `${currentOnlinePeers} Recurser${
@@ -110,9 +113,7 @@
         } Online`;
       }, 1000);
 
-      //Button Event Listeners
-      connectButton.addEventListener("click", makeConnection);
-      //mute and audio buttons
+      // mute and audio buttons
       muteButton.addEventListener("click", () => {
         modifyStream("audio", event.target);
       });
@@ -120,6 +121,8 @@
         modifyStream("video", event.target)
       );
 
+      // join and hangup buttons
+      connectButton.addEventListener("click", makeConnection);
       hangupButton.addEventListener("click", () => {
         if (isConnected() == false) {
           // if the roulette has started, end it and destroy the peer
@@ -139,20 +142,22 @@
         connectButton.removeAttribute("disabled");
       });
 
-      //fetches an available peer from the API endpoint
+      // fetches an available peer from the API endpoint
       async function startRoulette() {
+        // fetches all of the available peers
         const getPeers = await fetch("/api/peers");
         const availablePeers = new Set(await getPeers.json());
-
+        // removes the current peer ID so you can't pair with yourself
         availablePeers.delete(myPeerID);
-
         const firstAvailablePeer = availablePeers.values().next().value;
+        //initiates a call and connection
         peerCall = peer.call(firstAvailablePeer, stream);
         peerConn = peer.connect(firstAvailablePeer);
 
         peerCall.on("stream", handleStream);
         peerCall.on("close", handleClose);
 
+        // sends the current state to tell the peer if the stream is muted
         peerConn.on("open", () => peerConn.send(state));
         peerConn.on("data", handleConnection);
       }
@@ -203,14 +208,16 @@
           waitForPeer = setInterval(startRoulette, 1000);
         });
 
-        //make connection to peer
+        // make connection to peer
         peer.on("connection", function(conn) {
           peerConn = conn;
+          // sends the current state to tell the peer if the stream is muted
           peerConn.on("open", () => peerConn.send(state));
           peerConn.on("data", handleConnection);
         });
 
         peer.on("call", async function(call) {
+          // sets the global peerCall object to the call
           peerCall = call;
 
           if (you.srcObject !== null) {
@@ -220,7 +227,7 @@
 
           console.log("Receiving call");
 
-          // answer the call
+          // answer the call and send the the current user's stream
           peerCall.answer(stream);
           peerCall.on("stream", handleStream);
           peerCall.on("close", handleClose);
@@ -230,13 +237,17 @@
       async function handleStream(remoteStream) {
         // remove loading animation
         you.classList.remove("loading");
+
+        // sets the source for the video element to the incoming stream
         you.srcObject = remoteStream;
+        // removes the current user's peer id from the list
         await fetch(`/api/peers/consume/${myPeerID}`);
+        // ends the roulette
         clearInterval(waitForPeer);
       }
 
       function handleClose() {
-        // remote stream to the video HTML object
+        // remote stream to the video element
         you.srcObject = null;
 
         // close the connection and DESTRUCTION to the peer
@@ -254,6 +265,7 @@
       }
 
       function handleConnection(data) {
+        // sends information about if the peer is muted
         if (data.isMuted) {
           peerMutedSpan.style.display = "block";
         } else {
@@ -261,37 +273,37 @@
         }
       }
 
-      //event handlers for the mute and video buttons
-      //streamName can be "video" or "audio"
+      // event handler for the mute and video buttons
+      // streamName can be "video" or "audio"
       function modifyStream(streamName, target) {
         if (!stream) {
           return false;
         }
-        //finds if the specified stream is enabled
+        // finds if the specified stream is enabled
         let isEnabled = stream
           .getTracks()
           .filter(stream => stream.kind === streamName)[0].enabled;
 
-        //flips the value of isEnabled
+        // flips the value of isEnabled
         let isCurrentlyEnabled = !isEnabled;
 
-        //toggles the stream by directly modifying the stream object
+        // toggles the stream by directly modifying the stream object
         stream
           .getTracks()
           .filter(
             stream => stream.kind === streamName
           )[0].enabled = isCurrentlyEnabled;
 
-        //edits the HTML of the target
+        // edits the HTML of the target
         if (streamName === "audio") {
-          target.innerHTML = `${isCurrentlyEnabled ? "Mute" : "Unmute"}`;
-          //if the audio stream is enabled, the user is not muted. So flip the value of isCurrentlyEnabled.
+          target.textContent = `${isCurrentlyEnabled ? "Mute" : "Unmute"}`;
+          // if the audio stream is enabled, the user is not muted. So flip the value of isCurrentlyEnabled.
           let isMuted = !isCurrentlyEnabled;
-          //update state and send it to the peer
+          // update the state and send it to the peer
           state.isMuted = isMuted;
           peerConn.send(state);
         } else if (streamName === "video") {
-          target.innerHTML = `${isCurrentlyEnabled ? "Stop" : "Start"} Video`;
+          target.textContent = `${isCurrentlyEnabled ? "Stop" : "Start"} Video`;
         }
       }
       // determine if the peer stream connected
@@ -299,6 +311,7 @@
         return you.srcObject ? true : false;
       }
 
+      // bill
       (() => {
         const bill = new Konami(() => {
           const bills = [
