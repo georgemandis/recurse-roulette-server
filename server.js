@@ -49,6 +49,7 @@ const peerServer = ExpressPeerServer(server, options);
 const peers = new Set();
 const allPeers = new Set();
 
+app.use(cors(corsOptions));
 app.use("/", express.static("public"));
 app.set("trust proxy", 1);
 app.use("/peer", peerServer);
