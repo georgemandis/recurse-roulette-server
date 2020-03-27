@@ -54,7 +54,7 @@ app.get("/", function(req, res) {
     res.redirect("/auth");
   } else {
   	console.log(`Found token in the session: '${req.session.token}'; sending index html`);
-    res.sendFile(`${process.env.HOME}/index.html`);
+    res.sendFile(`${process.cwd()}/index.html`);
   }
 });
 
