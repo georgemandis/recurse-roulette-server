@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recurse Roulette</title>
+    <script src="https://browser.sentry-cdn.com/5.15.2/bundle.min.js" integrity="sha384-HA4Glk4hAwUFBIu+OfNR4bvn6vGCxT134gRiQce9rwp2YfxcuHHG8nG7qkooJwFt" crossorigin="anonymous">
+    </script>
     <script src="/js/peerjs.min.js"></script>
     <script src="/js/konami.js"></script>
     <link
@@ -86,6 +88,8 @@
     </div>
 
     <script>
+      Sentry.init({ dsn: 'https://aa873a0abe8b4ad8bb2a6f32c5fa2ffb@sentry.io/5177870' });
+      
       // video elements for the two streams
       const me = document.querySelector("#me");
       const you = document.querySelector("#you");
@@ -134,12 +138,11 @@
           hangupButton.disabled = true;
           return false;
         }
-
-        console.log("Initiating hangup");
+        
+        // if you are connected hang up
+        console.log("Clicked hangup");
         handleClose();
 
-        you.srcObject = null;
-        connectButton.removeAttribute("disabled");
       });
 
       // fetches an available peer from the API endpoint
@@ -150,18 +153,29 @@
         // removes the current peer ID so you can't pair with yourself
         availablePeers.delete(myPeerID);
         const firstAvailablePeer = availablePeers.values().next().value;
+
         //initiates a call and connection
         peerCall = peer.call(firstAvailablePeer, stream);
         peerConn = peer.connect(firstAvailablePeer);
 
         peerCall.on("stream", handleStream);
         peerCall.on("close", handleClose);
+        peerCall.on("error", errHandler("peerCall"));
 
         // sends the current state to tell the peer if the stream is muted
-        peerConn.on("open", () => peerConn.send(state));
+        peerConn.on("open", () => peerConn.open && peerConn.send(state));
         peerConn.on("data", handleConnection);
+        peerConn.on("error", errHandler("peerConn"));
       }
 
+      function errHandler(prefix) {
+        return err => {
+          console.log(`${prefix} <${err.type}>: ${err}`);
+          throw new Error(err);
+        }
+      }
+      // const errHandler = prefix => (err => console.log(prefix + ": ", err); // ? is this prettier?
+      
       async function makeConnection() {
         //disable join button, enable hang up mute and stop video buttons
         connectButton.disabled = true;
@@ -210,23 +224,32 @@
 
         // make connection to peer
         peer.on("connection", function(conn) {
+          if (isConnected()) {
+            console.log("data connection made, but already have connection. REJECTED.");
+            // reject this incoming conection
+            conn.close();
+            return false;
+          }
           peerConn = conn;
           // sends the current state to tell the peer if the stream is muted
           peerConn.on("open", () => peerConn.send(state));
           peerConn.on("data", handleConnection);
         });
 
+        // fires when another peer calls the current user
         peer.on("call", async function(call) {
-          // sets the global peerCall object to the call
-          peerCall = call;
-
-          if (you.srcObject !== null) {
-            console.log("call received, no srcObject");
+          // if the current user is already connected to a call, reject this call
+          if (isConnected()) {
+            console.log("call received, but already on call. REJECTED.");
+            // reject this incoming call
+            call.close();
             return false;
           }
 
           console.log("Receiving call");
 
+          // sets the global peerCall object to the call
+          peerCall = call;
           // answer the call and send the the current user's stream
           peerCall.answer(stream);
           peerCall.on("stream", handleStream);
@@ -247,6 +270,10 @@
       }
 
       function handleClose() {
+        // tell the remote peer that we're hanging up
+        if (isConnected()) {
+          peerConn && peerConn.open && peerConn.send({hangup: 'l8rz'});
+        }
         // remote stream to the video element
         you.srcObject = null;
 
@@ -270,6 +297,10 @@
           peerMutedSpan.style.display = "block";
         } else {
           peerMutedSpan.style.display = "none";
+        } 
+        if (data.hangup) {
+          console.log("Got a hangup");
+          handleClose()
         }
       }
 
@@ -301,14 +332,17 @@
           let isMuted = !isCurrentlyEnabled;
           // update the state and send it to the peer
           state.isMuted = isMuted;
-          peerConn.send(state);
+        
+          if (isConnected()){
+            peerConn.send(state);
+          }
         } else if (streamName === "video") {
           target.textContent = `${isCurrentlyEnabled ? "Stop" : "Start"} Video`;
         }
       }
       // determine if the peer stream connected
       function isConnected() {
-        return you.srcObject ? true : false;
+        return (peerConn && peerConn.open && peerCall && peerCall.open && you.srcObject) ? true : false;
       }
 
       // bill
@@ -329,6 +363,6 @@
             "<marquee scrollamount='20' behavior='alternate' style='width:30%;color:#00A0E6'>Gotta go fast!</marquee>";
         });
       })();
-    </script>
+    </script>    
   </body>
 </html>
