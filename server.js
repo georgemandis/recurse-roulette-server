@@ -10,7 +10,22 @@ const app = express();
 const ExpressPeerServer = require("peer").ExpressPeerServer;
 const server = app.listen(process.env.PORT);
 const session = require("express-session");
+const cors = require("cors");
 const debug = require("debug")("recurse-roulette:server");
+
+// CORs shenanigans to make it work nice with the Recurse subdomain
+// proxy stuff and PeerJS
+
+const whitelist = ["https://roulette.recurse.com"];
+const corsOptions = {
+  origin: function(origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
+};
 
 //oAuth stuff to authentication with Recurse Center log in
 const credentials = {
@@ -28,6 +43,7 @@ const oauth2 = require("simple-oauth2").create(credentials);
 const options = {
   debug: false
 };
+
 
 const peerServer = ExpressPeerServer(server, options);
 const peers = new Set();
