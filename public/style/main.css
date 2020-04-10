@@ -1,35 +1,49 @@
+/* CSS Variables */
+:root {
+ --header-font: "Libre Baskerville", "Georgia", serif;
+ --body-font: "Helvetica", "Arial", sans-serif;
+ --primary-color: #3dc06c;
+ --secondary-color:#2a2d2d;
+ --background-color: #ffffff;
+ --gray: #ccc;
+--red: red;
+ --text-color:#2a2d2d;
+ /* Screen Sizes */
+ --small: 450px;
+ --medium: 800px;
+}
+
 /* Button Styles */
-/* source https://fdossena.com/?p=html5cool/buttons/i.frag */
 .button {
   display: inline-block;
   min-width: 130px;
   border-radius: 10px;
   padding: 7.5px 15px;
-  border: 2px solid #3dc06c;
+  border: 2px solid var( --primary-color);
   box-sizing: border-box;
   text-decoration: none;
   font-weight: 400;
   font-size: 0.8em;
-  color: #2a2d2d;
-  border-color: #3dc06c;
-  background-color: #3dc06c;
+  color: var(--text-color);
+  border-color: var( --primary-color);
+  background-color: var( --primary-color);
   text-align: center;
   transition: all 0.15s;
 }
 .button:hover {
   cursor: pointer;
   font-weight: bold;
-  border-color: #3dc06c;
-  background-color: #ffffff;
+  border-color: var( --primary-color);
+  background-color: var( --primary-color);
 }
 .button:focus {
-  border-color: #3dc06c;
-  background-color: #3dc06c;
+  border-color: var( --primary-color);
+  background-color: var( --primary-color);
 }
 .button:disabled {
   cursor: auto;
-  border-color: #ccc;
-  background-color: #ccc;
+  border-color: var( --gray);
+  background-color: var( --gray);
 }
 .button:disabled:hover {
   font-weight: normal;
@@ -43,21 +57,22 @@
 /* Page Styles */
 html {
   font-size: 1.125em;
-  color: #2a2d2d;
+  color: var(--text-color);
 }
 
 body {
-  font: 100% "Helvetica", "Arial", sans-serif;
-  background-color: #ffffff;
+  font: 100% var(--body-font);
+  background-color: var( --background-color);
   min-height: 100vh;
   box-sizing: border-box;
   margin: 0;
 }
 
 .title {
+  text-align: center;
   margin: 0;
-  font-family: "Libre Baskerville", "Georgia", serif;
-  color: #3dc06c;
+  font-family: var(--header-font);
+  color: var( --primary-color);
 }
 
 .content {
@@ -66,30 +81,30 @@ body {
 }
 
 video {
-  border: 1px #2a2d2d solid;
+  border: 1px var( --secondary-color) solid;
   border-radius: 10px;
   /* 4:3 aspect ratio for large screen */
   width: 450px;
   height: 337.5px;
   margin: 0 7.5px;
 }
-@media screen and (max-width: 800px) {
+video.loading {
+  background: var( --primary-color) url("../media/loading.gif") no-repeat center;
+  background-size: auto;
+  -webkit-background-size: auto;
+  -moz-background-size: auto;
+  -o-background-size: auto;
+}
+@media screen and (max-width: var( --medium)) {
   video {
     margin: 0;
     height: 200px;
   }
 }
-@media screen and (max-width: 450px) {
+@media screen and (max-width: var( --small)) {
   video {
     width: 100%;
   }
-}
-video.loading {
-  background: #3dc06c url("../media/loading.gif") no-repeat center;
-  background-size: auto;
-  -webkit-background-size: auto;
-  -moz-background-size: auto;
-  -o-background-size: auto;
 }
 
 #me {
@@ -97,14 +112,14 @@ video.loading {
 }
 
 #peerMutedSpan {
-  color: red;
+  color: var(--red);
   display: none;
 }
 
 /* Nav Styles */
 nav {
-  background-color: #3dc06c;
-  color: #2a2d2d;
+  background-color: var( --primary-color);
+  color: var(--text-color);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -112,7 +127,7 @@ nav {
   min-height: 50px;
 }
 nav a {
-  color: #2a2d2d;
+  color: var(--text-color);
   text-decoration: none;
 }
 nav a:hover {
@@ -158,5 +173,3 @@ nav a:hover {
   justify-content: center;
   flex-wrap: wrap;
 }
-
-/*# sourceMappingURL=main.css.map */
