@@ -16,9 +16,9 @@ const debug = require("debug")("recurse-roulette:server");
 // CORs shenanigans to make it work nice with the Recurse subdomain
 // proxy stuff and PeerJS
 
-const whitelist = ["https://roulette.recurse.com"];
+const whitelist = [process.env.BASE_URI];
 const corsOptions = {
-  origin: function(origin, callback) {
+  origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
@@ -65,17 +65,20 @@ app.use(
   })
 );
 
-app.get("/", function(req, res) {  
-  if (!req.session.token) {
-  	console.log("No token, redirecting to /auth");
-    res.redirect("/auth");
-  } else {
-  	console.log(`Found token in the session: '${req.session.token}'; sending index html`);
+app.get("/", function (req, res) {
+  //session token is only required in production
+  if (process.env.DEVELOPMENT) {
     res.sendFile(`${process.cwd()}/index.html`);
+  } else if (req.session.token) {
+    console.log(`Found token in the session: '${req.session.token}'; sending index html`);
+    res.sendFile(`${process.cwd()}/index.html`);
+  } else {
+    console.log("No token, redirecting to /auth");
+    res.redirect("/auth");
   }
 });
 
-app.get("/callback", async function(req, res) {
+app.get("/callback", async function (req, res) {
   console.log("/callback");
   const tokenConfig = {
     code: req.query.code,
@@ -93,30 +96,31 @@ app.get("/callback", async function(req, res) {
   }
 });
 
-app.get("/auth", async function(req, res) {
+app.get("/auth", async function (req, res) {
   try {
-  	  const authorizationUri = oauth2.authorizationCode.authorizeURL({
-    	redirect_uri: process.env.REDIRECT_URI
-  	  });
+    const authorizationUri = oauth2.authorizationCode.authorizeURL({
+      redirect_uri: process.env.REDIRECT_URI
+    });
 
-  	  // Redirect example using Express (see http://expressjs.com/api.html#res.redirect)
-  	  res.redirect(authorizationUri);
+    // Redirect example using Express (see http://expressjs.com/api.html#res.redirect)
+    res.redirect(authorizationUri);
   } catch (error) {
-  	  console.log("Auth got error", error.message);
-  	  res.send("Error creating token: " + error.message);
+    console.log("Auth got error", error.message);
+    res.send("Error creating token: " + error.message);
   }
 });
 
-app.get("/api/peers", function(req, res) {
+//sends list of all peers who available to pair
+app.get("/api/peers", function (req, res) {
   console.log(`peers: '${JSON.stringify(Array.from(peers))}'`);
   return res.json(Array.from(peers));
 });
 
 // Client should send their own id to this endpoint
 // to be removed from the available peer list
-app.get("/api/peers/consume/:id", function(req, res) {
+app.get("/api/peers/consume/:id", function (req, res) {
   const consumedPeer = req.params.id;
-  console.log("consuming peer "+consumedPeer);
+  console.log("consuming peer " + consumedPeer);
   const result = peers.delete(consumedPeer);
   return res.json({
     success: result
@@ -126,27 +130,28 @@ app.get("/api/peers/consume/:id", function(req, res) {
 // Client should send add own id to this endpoint
 // if they've already been given a peer ID and simply
 // want to rejoin the queue.
-app.get("/api/peers/add/:id", function(req, res) {
+app.get("/api/peers/add/:id", function (req, res) {
   const addedPeer = req.params.id;
-  console.log("adding peer "+addedPeer);
+  console.log("adding peer " + addedPeer);
   const result = peers.add(addedPeer);
   return res.json({
     success: result
   });
 });
 
-app.get("/api/online", function(req, res) {
+//sends list of all peers who are online
+app.get("/api/online", function (req, res) {
   console.log(`online: '${JSON.stringify(Array.from(allPeers))}'`);
   return res.json(allPeers.size);
 });
 
-peerServer.on("connection", function(id) {
+peerServer.on("connection", function (id) {
   peers.add(id);
   allPeers.add(id);
   console.log(`*!*!*!*!* ${id} connected`);
 });
 
-peerServer.on("disconnect", function(id) {
+peerServer.on("disconnect", function (id) {
   peers.delete(id);
   allPeers.delete(id);
   console.log(`*!*!*!*!* ${id} disconnected`);
