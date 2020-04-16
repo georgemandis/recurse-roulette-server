@@ -6,8 +6,6 @@ Recurse Roulette allows Recursers to randomly pair and chat with each other. Try
 
 Recurse Roulette opens a peer to peer connection between users using a WebRTC Javascript library called Peer JS. Recurse Roulette requires clients to connect to a signaling server to be paired. After they have been paired, they share video and audio streams via a peer to peer connection.
 
-[gif of how it worked once]
-
 ### Tech Stack
 
 - [Peer.js](https://peerjs.com/) - used to make peer to peer connection on the client-side through WebRTC
@@ -55,17 +53,6 @@ Once the connection is made the peers can share media streams and data. Once the
 peer.destroy();
 ```
 
-## Recurse Roulette Team
-
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/georgemandis"><img src="https://avatars0.githubusercontent.com/u/21219?s=460&v=4" width="200px;" alt="Picture of George Madis"/><br /><b>George Mandis</b></a></td>
-    <td align="center"><a href="https://github.com/samson212"><img src="https://avatars2.githubusercontent.com/u/1728821?s=400&v=4" width="200px;" alt="Picture of Sam Lazarus"/><br /><b>Sam Lazarus</b></a></td>
-    <td align="center"><a href="https://github.com/allicolyer"><img src="https://avatars1.githubusercontent.com/u/11083917?s=460&v=4" width="200px;" alt="Picture of Allison Colyer"/><br /><b>Alli Colyer</b></a></td>
-    <td align="center"><a href="https://github.com/AsaNeedle"><img src="https://avatars3.githubusercontent.com/u/43149404?s=460&v=4" width="200px;" alt="Picture of Asa Needle"/><br /><b>Asa Needle</b></a></td>
-  </tr>
-</table>
-
 ## Contributing Guide
 
 We hope that future Recursers will enjoy using Recurse Roulette, and we are more than excited if you want to contribute! Here are some guidelines for contributing and running Recurse Roulette locally. If you have any questions, please feel free to contact us on Zulip.
@@ -100,9 +87,20 @@ We hope that future Recursers will enjoy using Recurse Roulette, and we are more
 2. Set up an OAuth app on Recurse on your [settings page](https://www.recurse.com/settings/apps)
 3. Replaces the values for ID and SECRET in your `.env` file with your
 4. Copy these values to a new `.env` file
-5. In your `.env` file change the value of DEVElOPMENT to `DEVELOPMENT=FALSE`
+5. In your `.env` file change the value of DEVELOPMENT to `DEVELOPMENT=FALSE`
 6. Create a [new Heroku app](https://devcenter.heroku.com/start)
-7. Change the hostname in index.html[./index.html#L195] to the URL of your Heroku instance
+7. Change the hostname in [index.html](./index.html#L195) to the URL of your Heroku instance
 8. Configure the [Heroku environment variables](https://devcenter.heroku.com/articles/config-vars)
 9. Follow Heroku's steps for [deployment](https://devcenter.heroku.com/articles/git#creating-a-heroku-remote)
-10. To set up your own Recurse domain, go to [your Recurse accounts](https://www.recurse.com/domains)****
+10. To set up your own Recurse domain, go to [your Recurse account](https://www.recurse.com/domains)
+
+## Recurse Roulette Team
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/georgemandis"><img src="https://avatars0.githubusercontent.com/u/21219?s=460&v=4" width="200px;" alt="Picture of George Madis"/><br /><b>George Mandis</b></a></td>
+    <td align="center"><a href="https://github.com/samson212"><img src="https://avatars2.githubusercontent.com/u/1728821?s=400&v=4" width="200px;" alt="Picture of Sam Lazarus"/><br /><b>Sam Lazarus</b></a></td>
+    <td align="center"><a href="https://github.com/allicolyer"><img src="https://avatars1.githubusercontent.com/u/11083917?s=460&v=4" width="200px;" alt="Picture of Allison Colyer"/><br /><b>Alli Colyer</b></a></td>
+    <td align="center"><a href="https://github.com/AsaNeedle"><img src="https://avatars3.githubusercontent.com/u/43149404?s=460&v=4" width="200px;" alt="Picture of Asa Needle"/><br /><b>Asa Needle</b></a></td>
+  </tr>
+</table>
