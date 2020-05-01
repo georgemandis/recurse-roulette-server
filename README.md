@@ -1,6 +1,12 @@
+<div align="center">
+
 # Recurse Roulette
 
 Recurse Roulette allows Recursers to randomly pair and chat with each other. Try using Recurse Roulette for coffee or lunch chats!
+
+![gif-of-recurse-roulette](./public/media/beards.gif)
+
+</div>
 
 ## Overview
 
@@ -20,35 +26,49 @@ Recurse Roulette requires users to authenticate with Recurse Center before signi
 
 When a client connects to the server, that client is given a peer ID. The server keeps track of the peer IDs as they connect. When a client requests to connect to another client, the server returns a list of available peers to connect to and the client randomly picks an id from this list. Once two peers are connected, both peer ids are removed from this list. The server also keeps track of all online clients. When a client ends a connection with another client, their peer id is destroyed and they are taken. To rejoin, they reconnect and are given a new peer id.
 The sever exposes three endpoints for the client to use:
+
 ```
 /api/peers
 ```
+
 This returns the list of available peers to connect do.
+
 ```
 /api/peers/consume/:id
 ```
+
 This removes the specified id from the peer set. The client sends their own id upon a successful stream/call connection.
+
 ```
 /api/online
 ```
+
 This returns the total number of peers who are online. When clients hang up, their peer ID is destroyed and removed from this list.
 
 ### Client Code
+
 When the client connects to the signaling server, a new peer object is created for that client.
+
 ```
 peer = new Peer({...});
 ```
+
 Listeners are assigned for incoming connections from other peers
+
 ```
 peer.on("call", async function (call)
 peer.on("connection", function (conn)
 ```
+
 Once a peer object is created, the client will try to initiate a data connection (`peer.connect`) and a media stream (`peer.call`) with the first available peer.
+
 ```
 peerCall = peer.call(firstAvailablePeer, stream);
 peerConn = peer.connect(firstAvailablePeer);
 ```
+
 Once the connection is made the peers can share media streams and data. Once the connection is closed, the client destroys the peer object.
+
 ```
 peer.destroy();
 ```
@@ -66,7 +86,7 @@ We hope that future Recursers will enjoy using Recurse Roulette, and we are more
 2. Create a new branch from master:
    ```
    git checkout -b new-feature-name
-   ````
+   ```
 3. Run `npm install` to make sure you have the latest dependencies
 4. Make your changes
 5. Push to your fork and submit a pull request through Github
@@ -74,6 +94,7 @@ We hope that future Recursers will enjoy using Recurse Roulette, and we are more
 ## Deployment Guide
 
 ### Running Recurse Roulette locally
+
 1. Clone the repository from Github, or create a fork.
    ```
    git clone https://github.com/georgemandis/recurse-roulette-server
@@ -83,6 +104,7 @@ We hope that future Recursers will enjoy using Recurse Roulette, and we are more
 4. Run `npm start` from the root
 
 ### Deploying with Heroku
+
 1. Follow the steps above to get Recurse Roulette running locally
 2. Set up an OAuth app on Recurse on your [settings page](https://www.recurse.com/settings/apps)
 3. Replaces the values for ID and SECRET in your `.env` file with your
