@@ -12,6 +12,7 @@ const server = app.listen(process.env.PORT);
 const session = require("express-session");
 const cors = require("cors");
 const debug = require("debug")("recurse-roulette:server");
+const https = require("https");
 
 // CORs shenanigans to make it work nice with the Recurse subdomain
 // proxy stuff and PeerJS
@@ -94,6 +95,36 @@ app.get("/callback", async function (req, res) {
     console.log("Access Token Error", error.message);
     res.send("Error creating token: " + error.message);
   }
+});
+
+app.get("/api/me", function (req, res) {
+  //options for http request
+  const options = {
+    hostname: "www.recurse.com",
+    path: "/api/v1/profiles/me",
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${req.session.token}`,
+    },
+  };
+  //http request to get the user's profile information
+  let responseJSON = "";
+  https
+    .request(options, (result) => {
+      result.setEncoding("utf8");
+      result.on("data", (data) => {
+        responseJSON += data;
+      });
+
+      result.on("end", () => {
+        //const myInfo
+        res.json(JSON.parse(responseJSON));
+      });
+    })
+    .on("error", (error) => {
+      console.error(error);
+    })
+    .end();
 });
 
 app.get("/auth", async function (req, res) {
