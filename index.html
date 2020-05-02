@@ -59,6 +59,12 @@
         <div class="flex-column">
           <video class="margin-bottom" id="you" autoplay="autoplay"></video>
           <span id="peerMutedSpan">Muted</span>
+          <span id="userInfo">
+            <span class="name"></span>
+            <span class="pronouns"></span>
+            <span class="timezone"></span>
+            <!-- <a href="" target="_blank">profile</a> -->
+          </span>
         </div>
       </div>
     </div>
@@ -167,6 +173,20 @@
       // add loading animation
       you.classList.add("loading");
 
+      // user info from the API
+      state.userInfo =
+        state.userInfo || (await (await fetch("/api/me")).json());
+      // figure out timezone
+      const offset = (new Date().getTimezoneOffset() * -1) / 60;
+      const hrs = Math.floor(offset);
+      const min = offset - hrs;
+      const offsetString = `${Math.floor((hrs + min) * 100)}`;
+      state.userInfo.timezone = `GMT ${
+        offset >= 0 ? "+" : ""
+        }${offsetString}`;
+
+      console.log(state.userInfo);
+
       // initiate media stream
       if (!me.srcObject) {
         stream = await navigator.mediaDevices.getUserMedia({
@@ -274,6 +294,17 @@
     }
 
     function handleConnection(data) {
+      // fill in the user info
+      document.querySelector(
+        "#userInfo .name"
+      ).textContent = `${data.userInfo.name}`;
+      document.querySelector(
+        "#userInfo .pronouns"
+      ).textContent = `(${data.userInfo.pronouns})`;
+      document.querySelector(
+        "#userInfo .timezone"
+      ).textContent = `${data.userInfo.timezone}`;
+
       // sends information about if the peer is muted
       if (data.isMuted) {
         peerMutedSpan.style.display = "block";
