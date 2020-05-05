@@ -8,9 +8,6 @@
  --gray: #ccc;
 --red: red;
  --text-color:#2a2d2d;
- /* Screen Sizes */
- --small: 450px;
- --medium: 800px;
 }
 
 /* Button Styles */
@@ -95,13 +92,13 @@ video.loading {
   -moz-background-size: auto;
   -o-background-size: auto;
 }
-@media screen and (max-width: var( --medium)) {
+@media screen and (max-width: 800px) {
   video {
     margin: 0;
     height: 200px;
   }
 }
-@media screen and (max-width: var( --small)) {
+@media screen and (max-width: 450px) {
   video {
     width: 100%;
   }
