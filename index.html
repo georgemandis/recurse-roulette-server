@@ -59,6 +59,12 @@
         <div class="flex-column">
           <video class="margin-bottom" id="you" autoplay="autoplay"></video>
           <span id="peerMutedSpan">Muted</span>
+          <span id="userInfo">
+            <span class="name"></span>
+            <span class="pronouns"></span>
+            <span class="timezone"></span>
+            <!-- <a href="" target="_blank">profile</a> -->
+          </span>
         </div>
       </div>
     </div>
@@ -73,12 +79,14 @@
   <script>
     Sentry.init({ dsn: 'https://aa873a0abe8b4ad8bb2a6f32c5fa2ffb@sentry.io/5177870' });
 
+    // checks if this is a dev environment
+    const isDev = location.hostname === 'localhost';
     // video elements for the two streams
     const me = document.querySelector("#me");
     const you = document.querySelector("#you");
     let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall, peerConn;
 
-    // the state keeps track of the current user's mic
+    // the state keeps track of the current user's mic and name-tag
     let state = {
       isMuted: false
     };
@@ -86,11 +94,19 @@
     // query selectors used throughout code
     const peerMutedSpan = document.querySelector("#peerMutedSpan");
     const onlinePeersSpan = document.querySelector("#onlinePeers");
+
+    // peer name-tag query selectors
+    const peerName = document.querySelector("#userInfo .name")
+    const peerPronouns = document.querySelector("#userInfo .pronouns")
+    const peerTimezone = document.querySelector("#userInfo .timezone")
+
     // buttons query selectors
     const muteButton = document.querySelector("#muteButton");
     const videoButton = document.querySelector("#videoButton");
     const connectButton = document.querySelector("#connect");
     const hangupButton = document.querySelector("#close");
+
+
 
     // updates how many peers are online every second
     const checkForOnlinePeers = setInterval(async () => {
@@ -167,6 +183,31 @@
       // add loading animation
       you.classList.add("loading");
 
+      // user info from the API
+      const endpoint = isDev ? "test-user.json" : "/api/me";
+      console.log(isDev ? "IS dev" : "is NOT dev");
+      state.userInfo =
+        state.userInfo || (await (await fetch(endpoint,
+          {
+            headers: new Headers({
+              'content-type': 'application/json',
+              'charset': 'utf-8'
+            }),
+          }
+        )).json());
+
+      // figure out timezone
+      const offset = (new Date().getTimezoneOffset() * -1) / 60;
+      const hrs = Math.floor(offset);
+      const min = offset - hrs;
+      const offsetString = `${Math.floor((hrs + min) * 100)}`;
+      state.userInfo.timezone = `GMT ${
+        offset >= 0 ? "+" : ""
+        }${offsetString}`;
+      // logs your o
+      console.log("my own user info")
+      console.log(state.userInfo);
+
       // initiate media stream
       if (!me.srcObject) {
         stream = await navigator.mediaDevices.getUserMedia({
@@ -192,7 +233,7 @@
     function setupPeer() {
       //change this value if you deploy your own instance of recurse roulette
       peer = new Peer({
-        host: location.hostname === 'localhost' ? location.hostname : "recurse-roulette.herokuapp.com",
+        host: isDev ? location.hostname : "recurse-roulette.herokuapp.com",
         port: location.port,
         path: "/peer"
       });
@@ -267,6 +308,11 @@
 
       // remove muted span for peer
       peerMutedSpan.style.display = "none";
+      // remove peer name tag
+      peerName.textContent = "";
+      peerPronouns.textContent = "";
+      peerTimezone.textContent = "";
+
       // disable hangup button, enable connect button
       hangupButton.disabled = true;
       connectButton.removeAttribute("disabled");
@@ -274,12 +320,20 @@
     }
 
     function handleConnection(data) {
+      console.log("data in handleConnection: ", data);
+
+      // fill in the user name-tag information
+      peerName.textContent = `${data.userInfo.name}`;
+      peerPronouns.textContent = `(${data.userInfo.pronouns})`;
+      peerTimezone.textContent = `${data.userInfo.timezone}`;
+
       // sends information about if the peer is muted
       if (data.isMuted) {
         peerMutedSpan.style.display = "block";
       } else {
         peerMutedSpan.style.display = "none";
       }
+      // the peer sends a hangup event when they initiate a hang up
       if (data.hangup) {
         console.log("Got a hangup");
         handleClose()
