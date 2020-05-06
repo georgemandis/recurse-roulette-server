@@ -45,6 +45,11 @@
       <!--Video stream for me-->
       <div class="flex-column">
         <video class="margin-bottom" id="me" autoplay="autoplay" muted></video>
+        <div id="myUserInfo" class="name-tag margin-bottom">
+          <span class="name"></span>
+          <span class="pronouns"></span>
+          <span class="timezone"></span>
+        </div>
         <div class="flex-row">
           <button class="button margin-bottom margin-x-small" disabled id="muteButton">
             Mute
@@ -58,13 +63,12 @@
       <div>
         <div class="flex-column">
           <video class="margin-bottom" id="you" autoplay="autoplay"></video>
-          <span id="peerMutedSpan">Muted</span>
-          <span id="userInfo">
+          <div id="peerUserInfo" class="name-tag margin-bottom">
             <span class="name"></span>
             <span class="pronouns"></span>
             <span class="timezone"></span>
-            <!-- <a href="" target="_blank">profile</a> -->
-          </span>
+          </div>
+          <span id="peerMutedSpan">Muted</span>
         </div>
       </div>
     </div>
@@ -96,17 +100,20 @@
     const onlinePeersSpan = document.querySelector("#onlinePeers");
 
     // peer name-tag query selectors
-    const peerName = document.querySelector("#userInfo .name")
-    const peerPronouns = document.querySelector("#userInfo .pronouns")
-    const peerTimezone = document.querySelector("#userInfo .timezone")
+    const peerName = document.querySelector("#peerUserInfo .name")
+    const peerPronouns = document.querySelector("#peerUserInfo .pronouns")
+    const peerTimezone = document.querySelector("#peerUserInfo .timezone")
+
+    // my name-tag query selectors
+    const myName = document.querySelector("#myUserInfo .name")
+    const myPronouns = document.querySelector("#myUserInfo .pronouns")
+    const myTimezone = document.querySelector("#myUserInfo .timezone")
 
     // buttons query selectors
     const muteButton = document.querySelector("#muteButton");
     const videoButton = document.querySelector("#videoButton");
     const connectButton = document.querySelector("#connect");
     const hangupButton = document.querySelector("#close");
-
-
 
     // updates how many peers are online every second
     const checkForOnlinePeers = setInterval(async () => {
@@ -204,9 +211,11 @@
       state.userInfo.timezone = `GMT ${
         offset >= 0 ? "+" : ""
         }${offsetString}`;
-      // logs your o
-      console.log("my own user info")
-      console.log(state.userInfo);
+
+      // fill in your own user information
+      myName.textContent = `${state.userInfo.name}`;
+      myPronouns.textContent = `(${state.userInfo.pronouns})`;
+      myTimezone.textContent = `${state.userInfo.timezone}`;
 
       // initiate media stream
       if (!me.srcObject) {
