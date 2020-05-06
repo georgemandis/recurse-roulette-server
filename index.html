@@ -44,7 +44,10 @@
     <div class="flex-row">
       <!--Video stream for me-->
       <div class="flex-column">
-        <video class="margin-bottom" id="me" autoplay="autoplay" muted></video>
+        <div class="video-container margin-bottom">
+          <img class="mute-icon" id="myMuteIcon" src="media/mute.svg" />
+          <video id="me" autoplay="autoplay" muted></video>
+        </div>
         <div id="myUserInfo" class="name-tag margin-bottom">
           <span class="name"></span>
           <span class="pronouns"></span>
@@ -60,15 +63,15 @@
         </div>
       </div>
       <!--Video stream for connect peer-->
-      <div>
-        <div class="flex-column">
-          <video class="margin-bottom" id="you" autoplay="autoplay"></video>
-          <div id="peerUserInfo" class="name-tag margin-bottom">
-            <span class="name"></span>
-            <span class="pronouns"></span>
-            <span class="timezone"></span>
-          </div>
-          <span id="peerMutedSpan">Muted</span>
+      <div class="flex-column">
+        <div class="video-container margin-bottom">
+          <img class="mute-icon" id="peerMuteIcon" src="media/mute.svg" />
+          <video id="you" autoplay="autoplay"></video>
+        </div>
+        <div id="peerUserInfo" class="name-tag margin-bottom">
+          <span class="name"></span>
+          <span class="pronouns"></span>
+          <span class="timezone"></span>
         </div>
       </div>
     </div>
@@ -96,7 +99,8 @@
     };
 
     // query selectors used throughout code
-    const peerMutedSpan = document.querySelector("#peerMutedSpan");
+    const peerMuteIcon = document.querySelector("#peerMuteIcon");
+    const myMuteIcon = document.querySelector("#myMuteIcon");
     const onlinePeersSpan = document.querySelector("#onlinePeers");
 
     // peer name-tag query selectors
@@ -316,7 +320,7 @@
       peer.destroy();
 
       // remove muted span for peer
-      peerMutedSpan.style.display = "none";
+      peerMuteIcon.style.display = "none";
       // remove peer name tag
       peerName.textContent = "";
       peerPronouns.textContent = "";
@@ -338,9 +342,9 @@
 
       // sends information about if the peer is muted
       if (data.isMuted) {
-        peerMutedSpan.style.display = "block";
+        peerMuteIcon.style.display = "block";
       } else {
-        peerMutedSpan.style.display = "none";
+        peerMuteIcon.style.display = "none";
       }
       // the peer sends a hangup event when they initiate a hang up
       if (data.hangup) {
@@ -372,7 +376,8 @@
 
       // edits the HTML of the target
       if (streamName === "audio") {
-        target.textContent = `${isCurrentlyEnabled ? "Mute" : "Unmute"}`;
+        target.textContent = `${isCurrentlyEnabled ? "Mute" : "Unmute"}`
+        myMuteIcon.style.display = `${isCurrentlyEnabled ? "none" : "block"}`
         // if the audio stream is enabled, the user is not muted. So flip the value of isCurrentlyEnabled.
         let isMuted = !isCurrentlyEnabled;
         // update the state and send it to the peer

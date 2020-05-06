@@ -1,18 +1,17 @@
 /* CSS Variables */
 :root {
- --header-font: "Libre Baskerville", "Georgia", serif;
- --body-font: "Helvetica", "Arial", sans-serif;
- --primary-color: #3dc06c;
- --secondary-color:#2a2d2d;
- --background-color: #ffffff;
- --gray: #ccc;
---red: red;
---text-color:#2a2d2d;
-/* Spacing */
---nav-height: 50px;
---border-radius: 10px;
---margin-big: 15px;
---margin-small: 7.5px;
+  --header-font: "Libre Baskerville", "Georgia", serif;
+  --body-font: "Helvetica", "Arial", sans-serif;
+  --primary-color: #3dc06c;
+  --secondary-color:#2a2d2d;
+  --background-color: #ffffff;
+  --gray: #ccc;
+  --text-color:#2a2d2d;
+  /* Spacing */
+  --nav-height: 50px;
+  --border-radius: 10px;
+  --margin-big: 15px;
+  --margin-small: 7.5px;
 }
 
 /* Button Styles */
@@ -109,13 +108,21 @@ video.loading {
   }
 }
 
-#me {
-  transform: scaleX(-1);
+.video-container {
+  position: relative;
 }
 
-#peerMutedSpan {
-  color: var(--red);
+.mute-icon {
+  z-index: 100;
+  width: 80px;
+  position: absolute;
+  bottom: var(--margin-big);
+  right: var(--margin-big);
   display: none;
+}
+
+#me {
+  transform: scaleX(-1);
 }
 
 /* Nav Styles */
