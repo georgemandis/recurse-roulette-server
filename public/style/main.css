@@ -1,20 +1,24 @@
 /* CSS Variables */
 :root {
- --header-font: "Libre Baskerville", "Georgia", serif;
- --body-font: "Helvetica", "Arial", sans-serif;
- --primary-color: #3dc06c;
- --secondary-color:#2a2d2d;
- --background-color: #ffffff;
- --gray: #ccc;
---red: red;
- --text-color:#2a2d2d;
+  --header-font: "Libre Baskerville", "Georgia", serif;
+  --body-font: "Helvetica", "Arial", sans-serif;
+  --primary-color: #3dc06c;
+  --secondary-color:#2a2d2d;
+  --background-color: #ffffff;
+  --gray: #ccc;
+  --text-color:#2a2d2d;
+  /* Spacing */
+  --nav-height: 50px;
+  --border-radius: 10px;
+  --margin-big: 15px;
+  --margin-small: 7.5px;
 }
 
 /* Button Styles */
 .button {
   display: inline-block;
   min-width: 130px;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   padding: 7.5px 15px;
   border: 2px solid var( --primary-color);
   box-sizing: border-box;
@@ -77,13 +81,28 @@ body {
   margin: 0 auto;
 }
 
-video {
+.video-container {
+  position: relative;
   border: 1px var( --secondary-color) solid;
-  border-radius: 10px;
+  margin: 0 var(--margin-small)
+}
+/* Sizing for video and video container */
+video, .video-container {
+  border-radius: var(--border-radius);
   /* 4:3 aspect ratio for large screen */
   width: 450px;
   height: 337.5px;
-  margin: 0 7.5px;
+}
+@media screen and (max-width: 800px) {
+  video, .video-container {
+    margin: 0;
+    height: 200px;
+  }
+}
+@media screen and (max-width: 450px) {
+  video, .video-container {
+    width: 100%;
+  }
 }
 video.loading {
   background: var( --primary-color) url("../media/loading.gif") no-repeat center;
@@ -92,25 +111,32 @@ video.loading {
   -moz-background-size: auto;
   -o-background-size: auto;
 }
-@media screen and (max-width: 800px) {
-  video {
-    margin: 0;
-    height: 200px;
-  }
+
+/* Name tag and mute icon are overlayed on top of video */
+.mute-icon {
+  z-index: 100;
+  width: 15px;
+  display: none;
 }
-@media screen and (max-width: 450px) {
-  video {
-    width: 100%;
-  }
+.name-tag {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: var(--margin-small);
+  background-color: rgb(42, 45, 45,0.8);
+  color: white;
+  border-radius: 0 0 0 var(--border-radius);
+  display:none;
+}
+.name-tag *{
+  margin-right: var(--margin-small);
+}
+.name-tag *:last-child{
+  margin-right: 0;
 }
 
 #me {
   transform: scaleX(-1);
-}
-
-#peerMutedSpan {
-  color: var(--red);
-  display: none;
 }
 
 /* Nav Styles */
@@ -121,7 +147,7 @@ nav {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  min-height: 50px;
+  min-height: var(--nav-height);
 }
 nav a {
   color: var(--text-color);
@@ -139,21 +165,21 @@ nav a:hover {
 /* Utilites */
 /* margin classes */
 .margin-top, .margin-y, .margin {
-  margin-top: 15px;
+  margin-top: var(--margin-big);
 }
 
 .margin-bottom, .margin-y, .margin {
-  margin-bottom: 15px;
+  margin-bottom: var(--margin-big);
 }
 
 .margin-x, .margin {
-  margin-left: 15px;
-  margin-right: 15px;
+  margin-left: var(--margin-big);
+  margin-right: var(--margin-big);
 }
 
 .margin-x-small {
-  margin-left: 7.5px;
-  margin-right: 7.5px;
+  margin-left: var(--margin-small);
+  margin-right: var(--margin-small);
 }
 
 /*flex divs */
