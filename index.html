@@ -45,13 +45,13 @@
       <!--Video stream for me-->
       <div class="flex-column">
         <div class="video-container margin-bottom">
-          <img class="mute-icon" id="myMuteIcon" src="media/mute.svg" />
           <video id="me" autoplay="autoplay" muted></video>
-        </div>
-        <div id="myUserInfo" class="name-tag margin-bottom">
-          <span class="name"></span>
-          <span class="pronouns"></span>
-          <span class="timezone"></span>
+          <div id="myUserInfo" class="name-tag">
+            <img class="mute-icon" id="myMuteIcon" src="media/mute.svg" />
+            <span class="name"></span>
+            <span class="pronouns"></span>
+            <span class="timezone"></span>
+          </div>
         </div>
         <div class="flex-row">
           <button class="button margin-bottom margin-x-small" disabled id="muteButton">
@@ -65,13 +65,13 @@
       <!--Video stream for connect peer-->
       <div class="flex-column">
         <div class="video-container margin-bottom">
-          <img class="mute-icon" id="peerMuteIcon" src="media/mute.svg" />
           <video id="you" autoplay="autoplay"></video>
-        </div>
-        <div id="peerUserInfo" class="name-tag margin-bottom">
-          <span class="name"></span>
-          <span class="pronouns"></span>
-          <span class="timezone"></span>
+          <div id="peerUserInfo" class="name-tag">
+            <img class="mute-icon" id="peerMuteIcon" src="media/mute.svg" />
+            <span class="name"></span>
+            <span class="pronouns"></span>
+            <span class="timezone"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -104,11 +104,13 @@
     const onlinePeersSpan = document.querySelector("#onlinePeers");
 
     // peer name-tag query selectors
+    const peerNameTag = document.querySelector("#peerUserInfo")
     const peerName = document.querySelector("#peerUserInfo .name")
     const peerPronouns = document.querySelector("#peerUserInfo .pronouns")
     const peerTimezone = document.querySelector("#peerUserInfo .timezone")
 
     // my name-tag query selectors
+    const myNameTag = document.querySelector("#myUserInfo")
     const myName = document.querySelector("#myUserInfo .name")
     const myPronouns = document.querySelector("#myUserInfo .pronouns")
     const myTimezone = document.querySelector("#myUserInfo .timezone")
@@ -217,6 +219,7 @@
         }${offsetString}`;
 
       // fill in your own user information
+      myNameTag.classList.add("flex-row")
       myName.textContent = `${state.userInfo.name}`;
       myPronouns.textContent = `(${state.userInfo.pronouns})`;
       myTimezone.textContent = `${state.userInfo.timezone}`;
@@ -319,9 +322,11 @@
       peerConn.close();
       peer.destroy();
 
-      // remove muted span for peer
+      // hide peer name tag
+      peerNameTag.classList.remove("flex-row")
+      // remove muted icon for peer
       peerMuteIcon.style.display = "none";
-      // remove peer name tag
+      // remove peer user info
       peerName.textContent = "";
       peerPronouns.textContent = "";
       peerTimezone.textContent = "";
@@ -336,6 +341,7 @@
       console.log("data in handleConnection: ", data);
 
       // fill in the user name-tag information
+      peerNameTag.classList.add("flex-row")
       peerName.textContent = `${data.userInfo.name}`;
       peerPronouns.textContent = `(${data.userInfo.pronouns})`;
       peerTimezone.textContent = `${data.userInfo.timezone}`;
@@ -377,7 +383,7 @@
       // edits the HTML of the target
       if (streamName === "audio") {
         target.textContent = `${isCurrentlyEnabled ? "Mute" : "Unmute"}`
-        myMuteIcon.style.display = `${isCurrentlyEnabled ? "none" : "block"}`
+        myMuteIcon.style.display = `${isCurrentlyEnabled ? "none" : "inline"}`
         // if the audio stream is enabled, the user is not muted. So flip the value of isCurrentlyEnabled.
         let isMuted = !isCurrentlyEnabled;
         // update the state and send it to the peer

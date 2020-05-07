@@ -83,24 +83,26 @@ body {
 
 .video-container {
   position: relative;
-}
-
-.mute-icon {
-  z-index: 100;
-  width: 80px;
-  position: absolute;
-  bottom: var(--margin-big);
-  right: var(--margin-big);
-  display: none;
-}
-
-video {
   border: 1px var( --secondary-color) solid;
+  margin: 0 var(--margin-small)
+}
+/* Sizing for video and video container */
+video, .video-container {
   border-radius: var(--border-radius);
   /* 4:3 aspect ratio for large screen */
   width: 450px;
   height: 337.5px;
-  margin: 0 var(--margin-small);
+}
+@media screen and (max-width: 800px) {
+  video, .video-container {
+    margin: 0;
+    height: 200px;
+  }
+}
+@media screen and (max-width: 450px) {
+  video, .video-container {
+    width: 100%;
+  }
 }
 video.loading {
   background: var( --primary-color) url("../media/loading.gif") no-repeat center;
@@ -109,38 +111,29 @@ video.loading {
   -moz-background-size: auto;
   -o-background-size: auto;
 }
-@media screen and (max-width: 800px) {
-  video {
-    margin: 0;
-    height: 200px;
-  }
-}
-@media screen and (max-width: 450px) {
-  video {
-    width: 100%;
-  }
-}
 
+/* Name tag and mute icon are overlayed on top of video */
+.mute-icon {
+  z-index: 100;
+  width: 15px;
+  display: none;
+}
 .name-tag {
-  margin: 0 var(--margin-small);
-  width: 450px;
-  min-height: 20px;
-  border: 2px solid var( --primary-color);
-  border-radius: var(--border-radius);
-  text-align: center;
-  padding: 15px 0px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: var(--margin-small);
+  background-color: rgb(42, 45, 45,0.8);
+  color: white;
+  border-radius: 0 0 0 var(--border-radius);
+  display:none;
 }
-@media screen and (max-width: 800px) {
-  .name-tag {
-    margin: 0;
-  }
+.name-tag *{
+  margin-right: var(--margin-small);
 }
-@media screen and (max-width: 450px) {
-  .name-tag {
-    width: 100%;
-  }
+.name-tag *:last-child{
+  margin-right: 0;
 }
-
 
 #me {
   transform: scaleX(-1);
