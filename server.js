@@ -49,6 +49,7 @@ const options = {
 const peerServer = ExpressPeerServer(server, options);
 const peers = new Set();
 const allPeers = new Set();
+const onDeckPeer = null;
 
 app.use(cors(corsOptions));
 app.use("/", express.static("public"));
@@ -171,13 +172,53 @@ app.get("/api/peers/add/:id", function (req, res) {
 });
 
 //sends list of all peers who are online
-app.get("/api/online", function (req, res) {
+app.get("/api/online/", function (req, res) {
   console.log(`online: '${JSON.stringify(Array.from(allPeers))}'`);
   return res.json(allPeers.size);
 });
 
+// state endpoint
+// get countime time(seconds) until next square
+// send the peer's match
+//
+app.get(["/api/whaddup", "/api/sitch"], function (req, res) {
+  const now = new Date();
+  const minutesInRound = 1;
+  const minutesFromLastRound = (now.getMinutes() % minutesInRound);
+  const secondsUntillNextRound = (minutesInRound * 60) - (minutesFromLastRound * 60 + now.getSeconds());
+
+  const situation = {
+    secondsUntillNextRound: secondsUntillNextRound,
+    allPeers: allPeers,
+    minutesInRound: minutesInRound,
+  }
+
+  res.json(situation);
+
+});
+
+app.get("/api/gimmePartner/:id", function (req, res) {
+  // remove yourself from the list of available peers
+  peers.delete(req.params.id);
+  let nextPartner = peers.values().next().value;
+
+  res.json({
+    partnerId: nextPartner || false
+  });
+
+  // if no one is waiting to be paired
+  // then the user making the request
+  // becomes the next user to be paired
+  if (nextPartner) {
+    peers.delete(nextPartner);
+  } else {
+    peers.add(req.params.id);
+  }
+})
+
+
 peerServer.on("connection", function (id) {
-  peers.add(id);
+  // peers.add(id);
   allPeers.add(id);
   console.log(`*!*!*!*!* ${id} connected`);
 });

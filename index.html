@@ -33,6 +33,9 @@
   <div class="content flex-column vertical-center margin-y">
     <h1 class="title margin-y">Recurse Roulette</h1>
     <h3 class="title margin-bottom" id="onlinePeers">--</h3>
+    <h4 class="title margin-bottom">
+      <pre id="timeToNextRound">--</pre>
+    </h4>
     <!-- Join and End Call buttons -->
     <div class="flex-row">
       <!--Join the queue-->
@@ -126,6 +129,52 @@
     const connectButton = document.querySelector("#connect");
     const hangupButton = document.querySelector("#close");
 
+    // fetch the number of minutes until the next round when opening web page
+    async function getStateAndStartCountdown() {
+      const situation = await (await fetch('/api/sitch')).json();
+      console.log(situation);
+      // get the time now
+      const startTime = Date.now();
+      const countDown = setInterval(async (initialCountdown) => {
+        // converts the seconds to next round
+        const elapsed = (Date.now() - startTime) / 1000;
+        const secondsUntillNextRound = initialCountdown - elapsed;
+        const minutes = Math.floor(secondsUntillNextRound / 60);
+        const seconds = Math.round(secondsUntillNextRound - (minutes * 60) - 1).toString().padStart(2, 0);
+        // update time in HTML
+        document.getElementById('timeToNextRound').textContent = `${minutes}:${seconds} until the next round!`;
+        // if the seconds are up and the user has joined the round and has a PeerID
+        if (secondsUntillNextRound <= 0 && myPeerID) {
+          clearInterval(countDown);
+          // get the gimmePartner endpoint
+          const newPartner = await (await fetch(`/api/gimmePartner/${myPeerID}`)).json();
+          if (newPartner) {
+            startRoulette(newPartner.partnerId);
+            getStateAndStartCountdown();
+            // fetch new state
+            // start new interval for *next* round
+          }
+          console.log(newPartner);
+          // if there are 30 seconds before the next round and hte user is current on a call, hangup on that call and rejoin the roulette
+        } else if (secondsUntillNextRound > 0 && secondsUntillNextRound <= 30 && myPeerID && isConnected()) {
+          console.log(`peerCall ${peerCall}`)
+          console.log(`myPeerID ${myPeerID}`)
+          console.log("Hanging up and joining again...");
+          // hang up on your current call and start a new call
+          await handleClose();
+          await makeConnection();
+          // hangup; get new id;
+
+        } else if (secondsUntillNextRound <= 0) {
+          // rinse & repeat
+        }
+
+      }, 1000, situation.secondsUntillNextRound)
+    }
+
+    // initiate when the page loads
+    getStateAndStartCountdown();
+
     // updates how many peers are online every second
     const checkForOnlinePeers = setInterval(async () => {
       const currentOnlinePeers = await (await fetch("/api/online")).json();
@@ -145,35 +194,16 @@
     // join and hangup buttons
     connectButton.addEventListener("click", makeConnection);
     hangupButton.addEventListener("click", () => {
-      if (isConnected() == false) {
-        // if the roulette has started, end it and destroy the peer
-        clearInterval(waitForPeer);
-        peer.destroy();
-        // remove loading animation, enable join button, disable hangup button
-        you.classList.remove("loading");
-        connectButton.removeAttribute("disabled");
-        hangupButton.disabled = true;
-        return false;
-      }
-
       // if you are connected hang up
       console.log("Clicked hangup");
       handleClose();
-
     });
 
     // fetches an available peer from the API endpoint
-    async function startRoulette() {
-      // fetches all of the available peers
-      const getPeers = await fetch("/api/peers");
-      const availablePeers = new Set(await getPeers.json());
-      // removes the current peer ID so you can't pair with yourself
-      availablePeers.delete(myPeerID);
-      const firstAvailablePeer = availablePeers.values().next().value;
-
+    async function startRoulette(specificPeer = false) {
       //initiates a call and connection
-      peerCall = peer.call(firstAvailablePeer, stream);
-      peerConn = peer.connect(firstAvailablePeer);
+      peerCall = peer.call(specificPeer, stream);
+      peerConn = peer.connect(specificPeer);
 
       peerCall.on("stream", handleStream);
       peerCall.on("close", handleClose);
@@ -263,7 +293,7 @@
       peer.on("open", function (id) {
         myPeerID = id;
         console.log("Opening conection to PeerJS", id);
-        waitForPeer = setInterval(startRoulette, 1000);
+        // waitForPeer = setInterval(startRoulette, 1000);
       });
 
       // make connection to peer
@@ -317,7 +347,18 @@
       // tell the remote peer that we're hanging up
       if (isConnected()) {
         peerConn && peerConn.open && peerConn.send({ hangup: 'l8rz' });
+      } else if (isConnected() == false) {
+        peer.destroy();
+
+        // George isn't crazy about this.
+        myPeerId = false;
+        // remove loading animation, enable join button, disable hangup button
+        you.classList.remove("loading");
+        connectButton.removeAttribute("disabled");
+        hangupButton.disabled = true;
+        return false;
       }
+
       // remote stream to the video element
       you.srcObject = null;
 
