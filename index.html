@@ -44,7 +44,7 @@
       </button>
       <!--End the call-->
       <button class="button margin-bottom margin-x-small" id="close" disabled>
-        Hang Up
+        Leave
       </button>
     </div>
 
@@ -138,9 +138,14 @@
       const countDown = setInterval(async (initialCountdown) => {
         // converts the seconds to next round
         const elapsed = (Date.now() - startTime) / 1000;
-        const secondsUntillNextRound = initialCountdown - elapsed;
-        const minutes = Math.floor(secondsUntillNextRound / 60);
-        const seconds = Math.round(secondsUntillNextRound - (minutes * 60) - 1).toString().padStart(2, 0);
+        // George likes this
+        let secondsUntillNextRound = initialCountdown - elapsed;
+        if (secondsUntillNextRound <= 0) {
+          secondsUntillNextRound = 0;
+        }
+        const minutes = Math.floor(secondsUntillNextRound / 60).toString().padStart(2, 0);
+        const seconds = Math.floor(secondsUntillNextRound - (minutes * 60)).toString().padStart(2, 0);
+
         // update time in HTML
         document.getElementById('timeToNextRound').textContent = `${minutes}:${seconds} until the next round!`;
         // if the seconds are up and the user has joined the round and has a PeerID
@@ -166,10 +171,12 @@
           // hangup; get new id;
 
         } else if (secondsUntillNextRound <= 0) {
-          // rinse & repeat
+          console.log("Refreshing state?");
+          clearInterval(countDown);
+          getStateAndStartCountdown();
         }
 
-      }, 1000, situation.secondsUntillNextRound)
+      }, 100, situation.secondsUntillNextRound)
     }
 
     // initiate when the page loads
@@ -196,6 +203,8 @@
     hangupButton.addEventListener("click", () => {
       // if you are connected hang up
       console.log("Clicked hangup");
+      // tell the peer you are hanging up on them
+      peerConn && peerConn.send({ hangup: 'l8rz' });
       handleClose();
     });
 
@@ -401,7 +410,8 @@
       // the peer sends a hangup event when they initiate a hang up
       if (data.hangup) {
         console.log("Got a hangup");
-        handleClose()
+        handleClose();
+        makeConnection();
       }
     }
 
