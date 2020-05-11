@@ -144,7 +144,7 @@ app.get("/auth", async function (req, res) {
 
 //sends list of all peers who available to pair
 app.get("/api/peers", function (req, res) {
-  console.log(`peers: '${JSON.stringify(Array.from(peers))}'`);
+  console.log(`/api/peers: '${JSON.stringify(Array.from(peers))}'`);
   return res.json(Array.from(peers));
 });
 
@@ -152,7 +152,7 @@ app.get("/api/peers", function (req, res) {
 // to be removed from the available peer list
 app.get("/api/peers/consume/:id", function (req, res) {
   const consumedPeer = req.params.id;
-  console.log("consuming peer " + consumedPeer);
+  console.log(`/api/peers/consume/${consumedPeer}`);
   const result = peers.delete(consumedPeer);
   return res.json({
     success: result
@@ -164,7 +164,7 @@ app.get("/api/peers/consume/:id", function (req, res) {
 // want to rejoin the queue.
 app.get("/api/peers/add/:id", function (req, res) {
   const addedPeer = req.params.id;
-  console.log("adding peer " + addedPeer);
+  console.log(`/api/peers/add/${addedPeer}`);
   const result = peers.add(addedPeer);
   return res.json({
     success: result
@@ -173,7 +173,7 @@ app.get("/api/peers/add/:id", function (req, res) {
 
 //sends list of all peers who are online
 app.get("/api/online/", function (req, res) {
-  console.log(`online: '${JSON.stringify(Array.from(allPeers))}'`);
+  console.log(`/api/online/: '${JSON.stringify(Array.from(allPeers))}'`);
   return res.json(allPeers.size);
 });
 
@@ -198,6 +198,7 @@ app.get(["/api/whaddup", "/api/sitch"], function (req, res) {
 });
 
 app.get("/api/gimmePartner/:id", function (req, res) {
+  console.log(`/api/gimmePartner/${req.params.id}`);
   // remove yourself from the list of available peers
   peers.delete(req.params.id);
   let nextPartner = peers.values().next().value;
