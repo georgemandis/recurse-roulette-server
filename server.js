@@ -203,6 +203,8 @@ app.get("/api/gimmePartner/:id", function (req, res) {
   peers.delete(req.params.id);
   let nextPartner = peers.values().next().value;
 
+  console.log(`got new peer: ${nextPartner}`);
+
   res.json({
     partnerId: nextPartner || false
   });
