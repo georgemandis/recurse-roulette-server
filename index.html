@@ -405,7 +405,7 @@
 
       if (state.expecting !== false && state.expecting !== myPeerID) {
         console.log("Politely closing", state);
-        await handleClose();
+        handleClose();
         return;
         // do a polite hangup because we were not expected
         // destroy the call
