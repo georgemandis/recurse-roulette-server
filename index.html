@@ -145,20 +145,27 @@
         }
         const minutes = Math.floor(secondsUntillNextRound / 60).toString().padStart(2, 0);
         const seconds = Math.floor(secondsUntillNextRound - (minutes * 60)).toString().padStart(2, 0);
-
         // update time in HTML
         document.getElementById('timeToNextRound').textContent = `${minutes}:${seconds} until the next round!`;
         // if the seconds are up and the user has joined the round and has a PeerID
         if (secondsUntillNextRound <= 0 && myPeerID) {
-          clearInterval(countDown);
-          // get the gimmePartner endpoint
-          const newPartner = await (await fetch(`/api/gimmePartner/${myPeerID}`)).json();
+
+          // if you aren't connected try to get a partner
+          const newPartner = !isConnected() && await (await fetch(`/api/gimmePartner/${myPeerID}`)).json();
+          // if you get a partner
           if (newPartner) {
-            startRoulette(newPartner.partnerId);
-            getStateAndStartCountdown();
-            // fetch new state
-            // start new interval for *next* round
+            // we need to check again if we are on a call /gimmePartner is async
+            if (!isConnected()) {
+              // start new interval for *next* round
+              startRoulette(newPartner.partnerId);
+
+              // if you are already on a call, put your partner back where they belong.
+            } else {
+              // add newPartner back into the pool
+              await fetch("/api/peers/add/" + newPartner.partnerId);
+            }
           }
+
           console.log(newPartner);
           // if there are 30 seconds before the next round and hte user is current on a call, hangup on that call and rejoin the roulette
         } else if (secondsUntillNextRound > 0 && secondsUntillNextRound <= 30 && myPeerID && isConnected()) {
@@ -169,10 +176,14 @@
           await handleClose();
           await makeConnection();
           // hangup; get new id;
+        }
 
-        } else if (secondsUntillNextRound <= 0) {
+        // reset countdown and update state at
+        // the end of each round
+        if (secondsUntillNextRound <= 0) {
           console.log("Refreshing state?");
           clearInterval(countDown);
+          // fetch new state
           getStateAndStartCountdown();
         }
 
@@ -211,6 +222,7 @@
     // fetches an available peer from the API endpoint
     async function startRoulette(specificPeer = false) {
       //initiates a call and connection
+
       peerCall = peer.call(specificPeer, stream);
       peerConn = peer.connect(specificPeer);
 
@@ -347,7 +359,7 @@
       // sets the source for the video element to the incoming stream
       you.srcObject = remoteStream;
       // removes the current user's peer id from the list
-      await fetch(`/api/peers/consume/${myPeerID}`);
+      // await fetch(`/api/peers/consume/${myPeerID}`);
       // ends the roulette
       clearInterval(waitForPeer);
     }
