@@ -49,7 +49,6 @@ const options = {
 const peerServer = ExpressPeerServer(server, options);
 const peers = new Set();
 const allPeers = new Set();
-const pairedPeers = new Set();
 const onDeckPeer = null;
 
 app.use(cors(corsOptions));
@@ -191,11 +190,7 @@ app.get(["/api/whaddup", "/api/sitch"], function (req, res) {
     secondsUntillNextRound: secondsUntillNextRound,
     allPeers: allPeers,
     minutesInRound: minutesInRound,
-  }
-
-  if (secondsUntillNextRound < 0) {
-    pairedPeers.clear();
-  }
+  }  
 
   res.json(situation);
 
@@ -205,16 +200,7 @@ app.get("/api/gimmePartner/:id", function (req, res) {
   console.log(`/api/gimmePartner/${req.params.id}`);
   console.log(`(peers: ${JSON.stringify(Array.from(peers))})`);
 
-  let nextPartner = peers.values().next().value;
-
-  if (pairedPeers.has(nextPartner) || pairedPeers.has(req.params.id)) {
-    console.log("One or the other ID is already paired with someone.");
-    console.log(`These are the paired peers ${JSON.stringify(Array.from(pairedPeers))}`);
-    res.json({
-      partnerId: false
-    });
-    return;
-  }
+  let nextPartner = peers.values().next().value;  
 
   console.log(`got new peer: ${nextPartner}`);
 
@@ -223,11 +209,8 @@ app.get("/api/gimmePartner/:id", function (req, res) {
   // becomes the next user to be paired
   if (nextPartner) {
     peers.delete(req.params.id);
-    peers.delete(nextPartner);
-    pairedPeers.add(nextPartner);
-    pairedPeers.add(req.params.id);
-    console.log(`pairing ${req.params.id} with ${nextPartner}`);
-    console.log(`paired peers ${JSON.stringify(Array.from(pairedPeers))}`);
+    peers.delete(nextPartner);    
+    console.log(`pairing ${req.params.id} with ${nextPartner}`);    
     res.json({ partnerId: nextPartner });
   } else {
     peers.add(req.params.id);
