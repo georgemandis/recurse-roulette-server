@@ -200,6 +200,7 @@ app.get("/api/gimmePartner/:id", function (req, res) {
   console.log(`/api/gimmePartner/${req.params.id}`);
   console.log(`(peers: ${JSON.stringify(Array.from(peers))})`);
 
+  peers.delete(req.params.id);
   let nextPartner = peers.values().next().value;  
 
   console.log(`got new peer: ${nextPartner}`);
@@ -207,13 +208,13 @@ app.get("/api/gimmePartner/:id", function (req, res) {
   // if no one is waiting to be paired
   // then the user making the request
   // becomes the next user to be paired
-  if (nextPartner) {
-    peers.delete(req.params.id);
+  if (nextPartner) {    
     peers.delete(nextPartner);    
     console.log(`pairing ${req.params.id} with ${nextPartner}`);    
     res.json({ partnerId: nextPartner });
   } else {
     peers.add(req.params.id);
+    res.json({ partnerId: false });
   }
 })
 

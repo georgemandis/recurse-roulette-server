@@ -154,32 +154,38 @@
         // update time in HTML
         document.getElementById('timeToNextRound').textContent = `${minutes}:${seconds} until the next round!`;
         // if the seconds are up and the user has joined the round and has a PeerID
+        // if you have a peerID you have joined for this round
         if (secondsUntillNextRound <= 0 && myPeerID) {
           clearInterval(countDown);
-          // get the gimmePartner endpoint
-          const newPartner = await (await fetch(`/api/gimmePartner/${myPeerID}`)).json();
-          if (newPartner) {
-            startRoulette(newPartner.partnerId);            
-            // fetch new state
-            // start new interval for *next* round
-          }
-          getStateAndStartCountdown();
-          console.log(newPartner);
+          // wait before starting this over
+          setTimeout(async ()=> { 
+            // get the gimmePartner endpoint
+            state.expecting = false;
+            const newPartner = await (await fetch(`/api/gimmePartner/${myPeerID}`)).json();
+            if (newPartner) {
+              // hang up calls here?
+              startRoulette(newPartner.partnerId);    
+              // fetch new state
+              // start new interval for *next* round
+            }
+            getStateAndStartCountdown() 
+            console.log(newPartner);
+          }, 2000);
+                    
           // if there are 30 seconds before the next round and hte user is current on a call, hangup on that call and rejoin the roulette
-        } else if (secondsUntillNextRound > 0 && secondsUntillNextRound <= 30 && myPeerID && isConnected()) {
-          console.log(`peerCall ${peerCall}`)
-          console.log(`myPeerID ${myPeerID}`)
+        } else if (secondsUntillNextRound > 0 && secondsUntillNextRound <= 30 && myPeerID && isConnected()) {          
+          console.log(`peerCall`, peerCall);
+          console.log(`myPeerID ${myPeerID}`);
           console.log("Hanging up and joining again...");
           // hang up on your current call and start a new call
-          await handleClose();
-          state.expecting = false;
+          await handleClose();        
           await makeConnection();
           // hangup; get new id;
 
         } else if (secondsUntillNextRound <= 0) {
           console.log("Refreshing state?");
           clearInterval(countDown);
-          getStateAndStartCountdown();
+          setTimeout(()=> { getStateAndStartCountdown() }, 2000);
         }
 
       }, 100, situation.secondsUntillNextRound)
@@ -235,6 +241,8 @@
 
     function errHandler(prefix) {
       return err => {
+        // why are we not just hanging here?
+        state.expecting = false;
         console.log(`${prefix} <${err.type}>: ${err}`);
         throw new Error(err);
       }
@@ -364,11 +372,13 @@
 
     function handleClose() {
       // tell the remote peer that we're hanging up
+      state.expecting = false;
+
       if (isConnected()) {
         peerConn && peerConn.open && peerConn.send({ hangup: 'l8rz' });
       } else if (isConnected() == false) {
         peer.destroy();
-
+        
         // George isn't crazy about this.
         myPeerId = false;
         // remove loading animation, enable join button, disable hangup button
