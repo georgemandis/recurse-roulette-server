@@ -3,10 +3,10 @@
   --header-font: "Libre Baskerville", "Georgia", serif;
   --body-font: "Helvetica", "Arial", sans-serif;
   --primary-color: #3dc06c;
-  --secondary-color:#2a2d2d;
+  --secondary-color: #2a2d2d;
   --background-color: #ffffff;
   --gray: #ccc;
-  --text-color:#2a2d2d;
+  --text-color: #2a2d2d;
   /* Spacing */
   --nav-height: 50px;
   --border-radius: 10px;
@@ -20,31 +20,31 @@
   min-width: 130px;
   border-radius: var(--border-radius);
   padding: 7.5px 15px;
-  border: 2px solid var( --primary-color);
+  border: 2px solid var(--primary-color);
   box-sizing: border-box;
   text-decoration: none;
   font-weight: 400;
   font-size: 0.8em;
   color: var(--text-color);
-  border-color: var( --primary-color);
-  background-color: var( --primary-color);
+  border-color: var(--primary-color);
+  background-color: var(--primary-color);
   text-align: center;
   transition: all 0.15s;
 }
 .button:hover {
   cursor: pointer;
   font-weight: bold;
-  border-color: var( --primary-color);
-  background-color: var( --primary-color);
+  border-color: var(--primary-color);
+  background-color: var(--primary-color);
 }
 .button:focus {
-  border-color: var( --primary-color);
-  background-color: var( --primary-color);
+  border-color: var(--primary-color);
+  background-color: var(--primary-color);
 }
 .button:disabled {
   cursor: auto;
-  border-color: var( --gray);
-  background-color: var( --gray);
+  border-color: var(--gray);
+  background-color: var(--gray);
 }
 .button:disabled:hover {
   font-weight: normal;
@@ -63,7 +63,7 @@ html {
 
 body {
   font: 100% var(--body-font);
-  background-color: var( --background-color);
+  background-color: var(--background-color);
   min-height: 100vh;
   box-sizing: border-box;
   margin: 0;
@@ -73,7 +73,7 @@ body {
   text-align: center;
   margin: 0;
   font-family: var(--header-font);
-  color: var( --primary-color);
+  color: var(--primary-color);
 }
 
 .content {
@@ -83,29 +83,32 @@ body {
 
 .video-container {
   position: relative;
-  border: 1px var( --secondary-color) solid;
-  margin: 0 var(--margin-small)
+  border: 1px var(--secondary-color) solid;
+  margin: 0 var(--margin-small);
 }
 /* Sizing for video and video container */
-video, .video-container {
+video,
+.video-container {
   border-radius: var(--border-radius);
   /* 4:3 aspect ratio for large screen */
   width: 450px;
   height: 337.5px;
 }
 @media screen and (max-width: 800px) {
-  video, .video-container {
+  video,
+  .video-container {
     margin: 0;
     height: 200px;
   }
 }
 @media screen and (max-width: 450px) {
-  video, .video-container {
+  video,
+  .video-container {
     width: 100%;
   }
 }
 video.loading {
-  background: var( --primary-color) url("../media/loading.gif") no-repeat center;
+  background: var(--primary-color) url("../media/loading.gif") no-repeat center;
   background-size: auto;
   -webkit-background-size: auto;
   -moz-background-size: auto;
@@ -123,15 +126,15 @@ video.loading {
   bottom: 0;
   left: 0;
   padding: var(--margin-small);
-  background-color: rgb(42, 45, 45,0.8);
+  background-color: rgb(42, 45, 45, 0.8);
   color: white;
   border-radius: 0 0 0 var(--border-radius);
-  display:none;
+  display: none;
 }
-.name-tag *{
+.name-tag * {
   margin-right: var(--margin-small);
 }
-.name-tag *:last-child{
+.name-tag *:last-child {
   margin-right: 0;
 }
 
@@ -145,10 +148,9 @@ video.loading {
   font-weight: normal;
 }
 
-
 /* Nav Styles */
 nav {
-  background-color: var( --primary-color);
+  background-color: var(--primary-color);
   color: var(--text-color);
   display: flex;
   flex-direction: row;
@@ -171,15 +173,20 @@ nav a:hover {
 
 /* Utilites */
 /* margin classes */
-.margin-top, .margin-y, .margin {
+.margin-top,
+.margin-y,
+.margin {
   margin-top: var(--margin-big);
 }
 
-.margin-bottom, .margin-y, .margin {
+.margin-bottom,
+.margin-y,
+.margin {
   margin-bottom: var(--margin-big);
 }
 
-.margin-x, .margin {
+.margin-x,
+.margin {
   margin-left: var(--margin-big);
   margin-right: var(--margin-big);
 }
