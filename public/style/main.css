@@ -69,10 +69,6 @@ body {
   margin: 0;
 }
 
-pre {
-  margin: 0;
-}
-
 .title {
   text-align: center;
   margin: 0;
@@ -142,6 +138,13 @@ video.loading {
 #me {
   transform: scaleX(-1);
 }
+
+/* Timer style */
+#timeToNextRound {
+  font-family: monospace;
+  font-weight: normal;
+}
+
 
 /* Nav Styles */
 nav {

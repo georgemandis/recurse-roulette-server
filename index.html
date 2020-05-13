@@ -33,9 +33,7 @@
   <div class="content flex-column vertical-center margin-y">
     <h1 class="title margin-y">Recurse Roulette</h1>
     <h3 class="title margin-bottom" id="onlinePeers">--</h3>
-    <h4 class="title margin-y">
-      <pre id="timeToNextRound">--</pre>
-    </h4>
+    <h3 class="title margin-y" id="timeToNextRound">--</h3>
     <!-- Join and End Call buttons -->
     <div class="flex-row">
       <!--Join the queue-->
@@ -156,11 +154,11 @@
         // update the UI with the number of seconds left in the round
         // if there are still seconds in this round, show them
         if (secondsUntillRoundEnds >= 0) {
-          updateTimerUI(secondsUntillRoundEnds, "this chat ends")
+          updateTimerUI(secondsUntillRoundEnds, "until this chat ends")
         }
         // otherwise show how much time until next round
         else {
-          updateTimerUI(secondsUntillNextRound, "next chat starts")
+          updateTimerUI(secondsUntillNextRound, "until next chat starts")
         }
 
         // if you have a peerID you have joined for this round
@@ -205,7 +203,16 @@
       const minutes = Math.floor(timePeriod / 60).toString().padStart(2, 0);
       const seconds = Math.floor(timePeriod - (minutes * 60)).toString().padStart(2, 0);
       //update timer HTML
-      document.getElementById('timeToNextRound').textContent = `${minutes}:${seconds} until ${description}`
+      const timer = document.getElementById('timeToNextRound')
+      // if there are less than 10 seconds, left make the timer bigger
+      if (seconds <= 10 && minutes <= 0) {
+        description = ""
+        timer.style.fontSize = "1.5em";
+      }
+      else {
+        timer.style.fontSize = "";
+      }
+      timer.textContent = `${minutes}:${seconds} ${description}`
     }
 
     // initiate when the page loads
