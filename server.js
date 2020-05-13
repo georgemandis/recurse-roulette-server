@@ -188,9 +188,10 @@ app.get(["/api/whaddup", "/api/sitch"], function (req, res) {
 
   const situation = {
     secondsUntillNextRound: secondsUntillNextRound,
+    waitPeriodInSeconds: 30,
     allPeers: allPeers,
     minutesInRound: minutesInRound,
-  }  
+  }
 
   res.json(situation);
 
