@@ -142,6 +142,8 @@ function updateTimerUI(timePeriod, description) {
 
 // initiate when the page loads
 getStateAndStartCountdown();
+// check local storage expiration
+checkLocalStorageExpiration()
 // update previous matches on the screen
 updateMatchUI()
 
@@ -445,21 +447,41 @@ function isConnected() {
     : false;
 }
 
-// update the list of matches in Local Storage
+// update the list of matches in localStorage
 function updateMatchList(newMatch) {
+  // if there is not expiration date set one
+  if (!localStorage.getItem('expiration')) {
+    setLocalStorageExpiration()
+  }
   let currentMatches = localStorage.getItem('matches') || "";
   let updatedMatches = `${currentMatches && `${currentMatches},`} ${newMatch}`
   localStorage.setItem('matches', updatedMatches);
   updateMatchUI(updatedMatches)
 }
 
-// update the list of matches on the UI
+// update the list of matches in the UI
 function updateMatchUI(matches = false) {
   const matchList = document.querySelector("#matchList");
   matches = matches || localStorage.getItem('matches');
-  console.log(matches)
   if (matches) {
     matchList.textContent = matches
+  }
+}
+// set localStorage to expire one week into the future
+function setLocalStorageExpiration() {
+  const weekInMilliseconds = 7 * 24 * 60 * 60 * 1000
+  let expiration = Date.now() + weekInMilliseconds
+  localStorage.setItem('expiration', expiration)
+}
+
+// check the current date to see if the expiration has passed
+function checkLocalStorageExpiration() {
+  let now = Date.now()
+  let expiration = localStorage.getItem('expiration')
+  // if the expiraton has passed, reset localStorage
+  if (now >= expiration) {
+    console.log("localStorage has expired, clearing")
+    localStorage.clear()
   }
 }
 
