@@ -49,6 +49,7 @@ const options = {
 const peerServer = ExpressPeerServer(server, options);
 const peers = new Set();
 const allPeers = new Set();
+const onDeckPeer = null;
 
 app.use(cors(corsOptions));
 app.use("/", express.static("public"));
@@ -143,7 +144,7 @@ app.get("/auth", async function (req, res) {
 
 //sends list of all peers who available to pair
 app.get("/api/peers", function (req, res) {
-  console.log(`peers: '${JSON.stringify(Array.from(peers))}'`);
+  console.log(`/api/peers: '${JSON.stringify(Array.from(peers))}'`);
   return res.json(Array.from(peers));
 });
 
@@ -151,7 +152,7 @@ app.get("/api/peers", function (req, res) {
 // to be removed from the available peer list
 app.get("/api/peers/consume/:id", function (req, res) {
   const consumedPeer = req.params.id;
-  console.log("consuming peer " + consumedPeer);
+  console.log(`/api/peers/consume/${consumedPeer}`);
   const result = peers.delete(consumedPeer);
   return res.json({
     success: result
@@ -163,7 +164,7 @@ app.get("/api/peers/consume/:id", function (req, res) {
 // want to rejoin the queue.
 app.get("/api/peers/add/:id", function (req, res) {
   const addedPeer = req.params.id;
-  console.log("adding peer " + addedPeer);
+  console.log(`/api/peers/add/${addedPeer}`);
   const result = peers.add(addedPeer);
   return res.json({
     success: result
@@ -171,13 +172,56 @@ app.get("/api/peers/add/:id", function (req, res) {
 });
 
 //sends list of all peers who are online
-app.get("/api/online", function (req, res) {
-  console.log(`online: '${JSON.stringify(Array.from(allPeers))}'`);
+app.get("/api/online/", function (req, res) {
   return res.json(allPeers.size);
 });
 
+// state endpoint
+// get countime time(seconds) until next square
+// send the peer's match
+//
+app.get(["/api/whaddup", "/api/sitch"], function (req, res) {
+  const now = new Date();
+  const minutesInRound = 3;
+  const minutesFromLastRound = (now.getMinutes() % minutesInRound);
+  const secondsUntillNextRound = (minutesInRound * 60) - (minutesFromLastRound * 60 + now.getSeconds());
+
+  const situation = {
+    secondsUntillNextRound: secondsUntillNextRound,
+    waitPeriodInSeconds: 30,
+    allPeers: allPeers,
+    minutesInRound: minutesInRound,
+  }
+
+  res.json(situation);
+
+});
+
+app.get("/api/gimmePartner/:id", function (req, res) {
+  console.log(`/api/gimmePartner/${req.params.id}`);
+  console.log(`(peers: ${JSON.stringify(Array.from(peers))})`);
+
+  peers.delete(req.params.id);
+  let nextPartner = peers.values().next().value;  
+
+  console.log(`got new peer: ${nextPartner}`);
+
+  // if no one is waiting to be paired
+  // then the user making the request
+  // becomes the next user to be paired
+  if (nextPartner) {    
+    peers.delete(nextPartner);    
+    console.log(`pairing ${req.params.id} with ${nextPartner}`);    
+    res.json({ partnerId: nextPartner });
+  } else {
+    peers.add(req.params.id);
+    res.json({ partnerId: false });
+  }
+})
+
+
 peerServer.on("connection", function (id) {
-  peers.add(id);
+  // peers.add(id);
   allPeers.add(id);
   console.log(`*!*!*!*!* ${id} connected`);
 });
