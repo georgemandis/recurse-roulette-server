@@ -33,17 +33,15 @@
   <div class="content flex-column vertical-center margin-y">
     <h1 class="title margin-y">Recurse Roulette</h1>
     <h3 class="title margin-bottom" id="onlinePeers">--</h3>
-    <h4 class="title margin-bottom">
-      <pre id="timeToNextRound">--</pre>
-    </h4>
+    <h3 class="title margin-y" id="timeToNextRound">--</h3>
     <!-- Join and End Call buttons -->
     <div class="flex-row">
       <!--Join the queue-->
-      <button class="button margin-bottom margin-x-small" id="connect">
+      <button class="button margin-y margin-x-small" id="connect">
         Join
       </button>
       <!--End the call-->
-      <button class="button margin-bottom margin-x-small" id="close" disabled>
+      <button class="button margin-y margin-x-small" id="close" disabled>
         Leave
       </button>
     </div>
@@ -136,6 +134,8 @@
     async function getStateAndStartCountdown() {
       const situation = await (await fetch('/api/sitch')).json();
       console.log(situation);
+      const waitPeriodInSeconds = situation.waitPeriodInSeconds
+
       // get the time now
       const startTime = Date.now();
       clearInterval(countDown);
@@ -143,52 +143,76 @@
       countDown = setInterval(async (initialCountdown) => {
         // converts the seconds to next round
         const elapsed = (Date.now() - startTime) / 1000;
-        // George likes this
+        // number of seconds before the next pairing
         let secondsUntillNextRound = initialCountdown - elapsed;
+        // number of seconds current chats have let to talk
+        let secondsUntillRoundEnds = secondsUntillNextRound - waitPeriodInSeconds;
+        // this is to prevent negative floats
         if (secondsUntillNextRound <= 0) {
           secondsUntillNextRound = 0;
         }
-        const minutes = Math.floor(secondsUntillNextRound / 60).toString().padStart(2, 0);
-        const seconds = Math.floor(secondsUntillNextRound - (minutes * 60)).toString().padStart(2, 0);
+        // update the UI with the number of seconds left in the round
+        // if there are still seconds in this round, show them
+        if (secondsUntillRoundEnds >= 0) {
+          updateTimerUI(secondsUntillRoundEnds, "until this chat ends")
+        }
+        // otherwise show how much time until next round
+        else {
+          updateTimerUI(secondsUntillNextRound, "until next chat starts")
+        }
 
-        // update time in HTML
-        document.getElementById('timeToNextRound').textContent = `${minutes}:${seconds} until the next round!`;
-        // if the seconds are up and the user has joined the round and has a PeerID
         // if you have a peerID you have joined for this round
         if (secondsUntillNextRound <= 0 && myPeerID) {
           clearInterval(countDown);
           // wait before starting this over
-          setTimeout(async ()=> { 
+          setTimeout(async () => {
             // get the gimmePartner endpoint
             state.expecting = false;
             const newPartner = await (await fetch(`/api/gimmePartner/${myPeerID}`)).json();
             if (newPartner) {
               // hang up calls here?
-              startRoulette(newPartner.partnerId);    
+              startRoulette(newPartner.partnerId);
               // fetch new state
               // start new interval for *next* round
             }
-            getStateAndStartCountdown() 
+            getStateAndStartCountdown()
             console.log(newPartner);
           }, 2000);
-                    
+
           // if there are 30 seconds before the next round and hte user is current on a call, hangup on that call and rejoin the roulette
-        } else if (secondsUntillNextRound > 0 && secondsUntillNextRound <= 30 && myPeerID && isConnected()) {          
+        } else if (secondsUntillNextRound > 0 && secondsUntillNextRound <= 30 && myPeerID && isConnected()) {
           console.log(`peerCall`, peerCall);
           console.log(`myPeerID ${myPeerID}`);
           console.log("Hanging up and joining again...");
           // hang up on your current call and start a new call
-          await handleClose();        
+          await handleClose();
           await makeConnection();
           // hangup; get new id;
 
         } else if (secondsUntillNextRound <= 0) {
           console.log("Refreshing state?");
           clearInterval(countDown);
-          setTimeout(()=> { getStateAndStartCountdown() }, 2000);
+          setTimeout(() => { getStateAndStartCountdown() }, 2000);
         }
 
       }, 100, situation.secondsUntillNextRound)
+    }
+
+    // function to update the timerUI
+    function updateTimerUI(timePeriod, description) {
+      const minutes = Math.floor(timePeriod / 60).toString().padStart(2, 0);
+      const seconds = Math.floor(timePeriod - (minutes * 60)).toString().padStart(2, 0);
+      //update timer HTML
+      const timer = document.getElementById('timeToNextRound')
+      // if there are less than 10 seconds, left make the timer bigger
+      if (seconds <= 10 && minutes <= 0) {
+        description = ""
+        timer.style.fontSize = "1.5em";
+      }
+      else {
+        timer.style.fontSize = "";
+      }
+      timer.textContent = `${minutes}:${seconds} ${description}`
     }
 
     // initiate when the page loads
