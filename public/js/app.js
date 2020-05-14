@@ -142,13 +142,15 @@ function updateTimerUI(timePeriod, description) {
 
 // initiate when the page loads
 getStateAndStartCountdown();
+// update previous matches on the screen
+updateMatchUI()
 
 // updates how many peers are online every second
 const checkForOnlinePeers = setInterval(async () => {
   const currentOnlinePeers = await (await fetch("/api/online")).json();
   onlinePeersSpan.textContent = `${currentOnlinePeers} Recurser${
     currentOnlinePeers === 1 ? "" : "s"
-  } Online`;
+    } Online`;
 }, 1000);
 
 // mute and audio buttons
@@ -382,6 +384,8 @@ function handleConnection(data) {
   peerName.textContent = `${data.userInfo.name}`;
   peerPronouns.textContent = `(${data.userInfo.pronouns})`;
   peerTimezone.textContent = `${data.userInfo.timezone}`;
+  // update localStorage with this user's name
+  updateMatchList(data.userInfo.name)
 
   // sends information about if the peer is muted
   if (data.isMuted) {
@@ -439,6 +443,24 @@ function isConnected() {
   return peerConn && peerConn.open && peerCall && peerCall.open && you.srcObject
     ? true
     : false;
+}
+
+// update the list of matches in Local Storage
+function updateMatchList(newMatch) {
+  let currentMatches = localStorage.getItem('matches') || "";
+  let updatedMatches = `${currentMatches && `${currentMatches},`} ${newMatch}`
+  localStorage.setItem('matches', updatedMatches);
+  updateMatchUI(updatedMatches)
+}
+
+// update the list of matches on the UI
+function updateMatchUI(matches = false) {
+  const matchList = document.querySelector("#matchList");
+  matches = matches || localStorage.getItem('matches');
+  console.log(matches)
+  if (matches) {
+    matchList.textContent = matches
+  }
 }
 
 // bill
