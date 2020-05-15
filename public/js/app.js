@@ -142,13 +142,17 @@ function updateTimerUI(timePeriod, description) {
 
 // initiate when the page loads
 getStateAndStartCountdown();
+// check local storage expiration
+checkLocalStorageExpiration()
+// update previous matches on the screen
+updateMatchUI()
 
 // updates how many peers are online every second
 const checkForOnlinePeers = setInterval(async () => {
   const currentOnlinePeers = await (await fetch("/api/online")).json();
   onlinePeersSpan.textContent = `${currentOnlinePeers} Recurser${
     currentOnlinePeers === 1 ? "" : "s"
-  } Online`;
+    } Online`;
 }, 1000);
 
 // mute and audio buttons
@@ -382,6 +386,8 @@ function handleConnection(data) {
   peerName.textContent = `${data.userInfo.name}`;
   peerPronouns.textContent = `(${data.userInfo.pronouns})`;
   peerTimezone.textContent = `${data.userInfo.timezone}`;
+  // update localStorage with this user's name
+  updateMatchList(data.userInfo.name)
 
   // sends information about if the peer is muted
   if (data.isMuted) {
@@ -439,6 +445,44 @@ function isConnected() {
   return peerConn && peerConn.open && peerCall && peerCall.open && you.srcObject
     ? true
     : false;
+}
+
+// update the list of matches in localStorage
+function updateMatchList(newMatch) {
+  // if there is not expiration date set one
+  if (!localStorage.getItem('expiration')) {
+    setLocalStorageExpiration()
+  }
+  let currentMatches = localStorage.getItem('matches') || "";
+  let updatedMatches = `${currentMatches && `${currentMatches},`} ${newMatch}`
+  localStorage.setItem('matches', updatedMatches);
+  updateMatchUI(updatedMatches)
+}
+
+// update the list of matches in the UI
+function updateMatchUI(matches = false) {
+  const matchList = document.querySelector("#matchList");
+  matches = matches || localStorage.getItem('matches');
+  if (matches) {
+    matchList.textContent = matches
+  }
+}
+// set localStorage to expire one week into the future
+function setLocalStorageExpiration() {
+  const weekInMilliseconds = 7 * 24 * 60 * 60 * 1000
+  let expiration = Date.now() + weekInMilliseconds
+  localStorage.setItem('expiration', expiration)
+}
+
+// check the current date to see if the expiration has passed
+function checkLocalStorageExpiration() {
+  let now = Date.now()
+  let expiration = localStorage.getItem('expiration')
+  // if the expiraton has passed, reset localStorage
+  if (now >= expiration) {
+    console.log("localStorage has expired, clearing")
+    localStorage.clear()
+  }
 }
 
 // bill
