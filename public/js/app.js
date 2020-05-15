@@ -453,3 +453,31 @@ function isConnected() {
       "<marquee scrollamount='20' behavior='alternate' style='width:30%;color:#00A0E6'>Gotta go fast!</marquee>";
   });
 })();
+
+/**
+ * Update the app download link if we're not already
+ * in the Electron app.
+ */
+if (!(navigator.userAgent.toLowerCase().indexOf(" electron/") > -1)) {
+  const appLinks = [
+    ["^mac", "https://teambeard.s3.amazonaws.com/recurse-roulette-1.0.0.dmg"],
+    [
+      "^win",
+      "https://teambeard.s3.amazonaws.com/recurse-roulette-setup-1.0.0.exe",
+    ],
+    [
+      "^linux",
+      "https://teambeard.s3.amazonaws.com/recurse-roulette-1.0.0.AppImage",
+    ],
+  ];
+
+  appLinks.forEach((platformCheck) => {
+    const check = new RegExp(platformCheck[0], "i");
+
+    if (!!check.test(navigator.platform)) {
+      const download = document.querySelector("#download");
+      download.href = platformCheck[1];
+      download.hidden = false;
+    }
+  });
+}
