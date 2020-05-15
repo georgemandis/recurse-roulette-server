@@ -20,6 +20,7 @@ let state = {
 const peerMuteIcon = document.querySelector("#peerMuteIcon");
 const myMuteIcon = document.querySelector("#myMuteIcon");
 const onlinePeersSpan = document.querySelector("#onlinePeers");
+const matchContainer = document.querySelector("#matchContainer");
 
 // peer name-tag query selectors
 const peerNameTag = document.querySelector("#peerUserInfo");
@@ -142,10 +143,8 @@ function updateTimerUI(timePeriod, description) {
 
 // initiate when the page loads
 getStateAndStartCountdown();
-// check local storage expiration
-checkLocalStorageExpiration()
 // update previous matches on the screen
-updateMatchUI()
+initalizeMatchUI()
 
 // updates how many peers are online every second
 const checkForOnlinePeers = setInterval(async () => {
@@ -447,6 +446,23 @@ function isConnected() {
     : false;
 }
 
+function initalizeMatchUI() {
+  // check the current date to see if the expiration has passeds
+  let now = Date.now()
+  let expiration = localStorage.getItem('expiration')
+  // if the expiraton has passed, reset localStorage
+  if (expiration && now >= expiration) {
+    console.log("localStorage has expired, clearing")
+    localStorage.clear()
+  }
+  let matches = localStorage.getItem('matches');
+  if (matches) {
+    matchContainer.style.display = "block"
+    matchArray = matches.split(",")
+    matchArray.forEach(match => appendNewMatchtoUI(match))
+  }
+}
+
 // update the list of matches in localStorage
 function updateMatchList(newMatch) {
   // if there is not expiration date set one
@@ -454,19 +470,20 @@ function updateMatchList(newMatch) {
     setLocalStorageExpiration()
   }
   let currentMatches = localStorage.getItem('matches') || "";
-  let updatedMatches = `${currentMatches && `${currentMatches},`} ${newMatch}`
+  let updatedMatches = `${currentMatches && `${currentMatches},`}${newMatch}`
   localStorage.setItem('matches', updatedMatches);
-  updateMatchUI(updatedMatches)
+  appendNewMatchtoUI(newMatch)
 }
 
 // update the list of matches in the UI
-function updateMatchUI(matches = false) {
+function appendNewMatchtoUI(match) {
+  matchContainer.style.display = "block"
   const matchList = document.querySelector("#matchList");
-  matches = matches || localStorage.getItem('matches');
-  if (matches) {
-    matchList.textContent = matches
-  }
+  let listItem = document.createElement("li");
+  listItem.textContent = match
+  matchList.appendChild(listItem);
 }
+
 // set localStorage to expire one week into the future
 function setLocalStorageExpiration() {
   const weekInMilliseconds = 7 * 24 * 60 * 60 * 1000
