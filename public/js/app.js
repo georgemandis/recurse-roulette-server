@@ -314,8 +314,7 @@ async function handleStream(remoteStream) {
 
   // sets the source for the video element to the incoming stream
   you.srcObject = remoteStream;
-  // removes the current user's peer id from the list
-  // await fetch(`/api/peers/consume/${myPeerID}`);
+
   // ends the roulette
   // clearInterval(waitForPeer);
 }

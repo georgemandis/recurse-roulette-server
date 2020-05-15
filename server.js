@@ -148,17 +148,6 @@ app.get("/api/peers", function (req, res) {
   return res.json(Array.from(peers));
 });
 
-// Client should send their own id to this endpoint
-// to be removed from the available peer list
-app.get("/api/peers/consume/:id", function (req, res) {
-  const consumedPeer = req.params.id;
-  console.log(`/api/peers/consume/${consumedPeer}`);
-  const result = peers.delete(consumedPeer);
-  return res.json({
-    success: result
-  });
-});
-
 // Client should send add own id to this endpoint
 // if they've already been given a peer ID and simply
 // want to rejoin the queue.
