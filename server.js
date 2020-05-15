@@ -182,7 +182,7 @@ app.get("/api/online/", function (req, res) {
 //
 app.get(["/api/whaddup", "/api/sitch"], function (req, res) {
   const now = new Date();
-  const minutesInRound = 5;
+  const minutesInRound = process.env.DEVELOPMENT ? 1 : 5
   const minutesFromLastRound = (now.getMinutes() % minutesInRound);
   const secondsUntillNextRound = (minutesInRound * 60) - (minutesFromLastRound * 60 + now.getSeconds());
 
