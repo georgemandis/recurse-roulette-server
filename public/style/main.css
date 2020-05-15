@@ -148,6 +148,37 @@ video.loading {
   font-weight: normal;
 }
 
+/* Match List style */
+#matchContainer {
+  width: 80%;
+  display: none;
+}
+#matchHeader {
+  display: block;
+}
+#matchList {
+  list-style-type: none;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0;
+}
+#matchList li {
+  width: 33.33%;
+}
+@media screen and (max-width: 800px) {
+  #matchList li {
+    width: 50%;
+  }
+}
+@media screen and (max-width: 450px) {
+  #matchContainer {
+    width: 100%;
+  }
+  #matchList li {
+    width: 100%;
+  }
+}
+
 /* Nav Styles */
 nav {
   background-color: var(--primary-color);
@@ -212,5 +243,5 @@ nav a:hover {
 }
 
 .text-center {
-  text-align:center;
+  text-align: center;
 }
