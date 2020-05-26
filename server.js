@@ -142,44 +142,12 @@ app.get("/auth", async function (req, res) {
   }
 });
 
-//sends list of all peers who available to pair
-app.get("/api/peers", function (req, res) {
-  console.log(`/api/peers: '${JSON.stringify(Array.from(peers))}'`);
-  return res.json(Array.from(peers));
-});
-
-// Client should send their own id to this endpoint
-// to be removed from the available peer list
-app.get("/api/peers/consume/:id", function (req, res) {
-  const consumedPeer = req.params.id;
-  console.log(`/api/peers/consume/${consumedPeer}`);
-  const result = peers.delete(consumedPeer);
-  return res.json({
-    success: result
-  });
-});
-
-// Client should send add own id to this endpoint
-// if they've already been given a peer ID and simply
-// want to rejoin the queue.
-app.get("/api/peers/add/:id", function (req, res) {
-  const addedPeer = req.params.id;
-  console.log(`/api/peers/add/${addedPeer}`);
-  const result = peers.add(addedPeer);
-  return res.json({
-    success: result
-  });
-});
-
 //sends list of all peers who are online
 app.get("/api/online/", function (req, res) {
   return res.json(allPeers.size);
 });
 
-// state endpoint
-// get countime time(seconds) until next square
-// send the peer's match
-//
+// state endpoint - get countime time(seconds) until next round
 app.get(["/api/whaddup", "/api/sitch"], function (req, res) {
   const now = new Date();
   const minutesInRound = process.env.DEVELOPMENT ? 1 : 5
@@ -197,21 +165,22 @@ app.get(["/api/whaddup", "/api/sitch"], function (req, res) {
 
 });
 
+// gimmePartner - returns a partner to pair with
 app.get("/api/gimmePartner/:id", function (req, res) {
   console.log(`/api/gimmePartner/${req.params.id}`);
   console.log(`(peers: ${JSON.stringify(Array.from(peers))})`);
 
   peers.delete(req.params.id);
-  let nextPartner = peers.values().next().value;  
+  let nextPartner = peers.values().next().value;
 
   console.log(`got new peer: ${nextPartner}`);
 
   // if no one is waiting to be paired
   // then the user making the request
   // becomes the next user to be paired
-  if (nextPartner) {    
-    peers.delete(nextPartner);    
-    console.log(`pairing ${req.params.id} with ${nextPartner}`);    
+  if (nextPartner) {
+    peers.delete(nextPartner);
+    console.log(`pairing ${req.params.id} with ${nextPartner}`);
     res.json({ partnerId: nextPartner });
   } else {
     peers.add(req.params.id);
@@ -219,9 +188,7 @@ app.get("/api/gimmePartner/:id", function (req, res) {
   }
 })
 
-
 peerServer.on("connection", function (id) {
-  // peers.add(id);
   allPeers.add(id);
   console.log(`*!*!*!*!* ${id} connected`);
 });

@@ -8,7 +8,8 @@ const isDev = location.hostname === "localhost";
 // video elements for the two streams
 const me = document.querySelector("#me");
 const you = document.querySelector("#you");
-let myPeerID, yourPeerID, stream, peer, waitForPeer, peerCall, peerConn;
+// global variables
+let myPeerID, stream, peer, peerCall, peerConn, countDown;
 
 // the state keeps track of the current user's mic and name-tag
 let state = {
@@ -39,8 +40,6 @@ const muteButton = document.querySelector("#muteButton");
 const videoButton = document.querySelector("#videoButton");
 const connectButton = document.querySelector("#connect");
 const hangupButton = document.querySelector("#close");
-
-let countDown;
 
 // fetch the number of minutes until the next round when opening web page
 async function getStateAndStartCountdown() {
@@ -268,7 +267,6 @@ function setupPeer() {
   peer.on("open", function (id) {
     myPeerID = id;
     console.log("Opening conection to PeerJS", id);
-    // waitForPeer = setInterval(startRoulette, 1000);
   });
 
   // make connection to peer
@@ -311,13 +309,8 @@ function setupPeer() {
 async function handleStream(remoteStream) {
   // remove loading animation
   you.classList.remove("loading");
-
   // sets the source for the video element to the incoming stream
   you.srcObject = remoteStream;
-  // removes the current user's peer id from the list
-  // await fetch(`/api/peers/consume/${myPeerID}`);
-  // ends the roulette
-  // clearInterval(waitForPeer);
 }
 
 function handleClose() {
