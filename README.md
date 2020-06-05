@@ -28,7 +28,7 @@ Recurse Roulette shuffles and reconnects clients every five minutes. To keep the
 
 Clients need to click "Join" to connect to the signaling server and to be paired for the next chat round. When this happens, the client is given a peer ID by the server. When a new round starts, each client that has joined requests a partner from the server. The server pairs each client as the requests come in. If there is another client that has requested a partner, the server pairs those two clients, otherwise the server remembers the client’s peer ID until another client requests a partner. When the round ends, each client's peer ID is destroyed, which ends the current call, and each client is given a new ID for the next round. If a client disconnects, its peer ID is destroyed, and it must rejoin to receive a new one.
 
-The sever exposes three endpoints:
+The server exposes three endpoints:
 
 ```
 /api/sitch
