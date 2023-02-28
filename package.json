@@ -24,7 +24,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "konami": "^1.6.2",
-    "peer": "^0.2.10",
+    "peer": "^0.6.1",
     "simple-oauth2": "^3.3.0"
   }
 }
